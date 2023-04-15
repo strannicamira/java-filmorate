@@ -14,6 +14,7 @@ import java.util.HashMap;
 public class FilmController {
 
     private HashMap<Integer, Film> films = new HashMap<>();
+    private Integer idCounter = 0;
 
     @GetMapping("/films")
     public HashMap<Integer, Film> findAll() {
@@ -21,21 +22,24 @@ public class FilmController {
     }
 
     @PostMapping(value = "/films")
+    @ResponseBody
     public Film create(@Valid @RequestBody Film film) {
-        if (//films.containsKey(film.getId())||
-                film.getDescription().length()>200  ||
-                film.getReleaseDate().isBefore(LocalDate.of(1985,12,28))) {
+        if (film.getDescription().length() > 200 ||
+                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))
+        ) {
             throw new ValidationException();
         }
+        film.setId(++idCounter);
         films.put(film.getId(), film);
-        log.debug("Фильм создан: '{}'",film);
+        log.debug("Фильм создан: '{}'", film);
         return film;
     }
 
     @PutMapping(value = "/films")
+    @ResponseBody
     public Film update(@Valid @RequestBody Film film) {
         films.put(film.getId(), film);
-        log.debug("Фильм обновлен: '{}'",film);
+        log.debug("Фильм обновлен: '{}'", film);
         return film;
     }
 }

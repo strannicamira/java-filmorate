@@ -13,6 +13,7 @@ import java.util.HashMap;
 public class UserController {
 
     private HashMap<Integer, User> users = new HashMap<>();
+    private Integer idCounter = 0;
 
     @GetMapping("/users")
     public HashMap<Integer, User> findAll() {
@@ -20,23 +21,22 @@ public class UserController {
     }
 
     @PostMapping(value = "/users")
+    @ResponseBody
     public User create(@Valid @RequestBody User user) {
-        if (users.containsKey(user.getId())) {
-            throw new ValidationException();
-
-        }
         if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
+        user.setId(++idCounter);
         users.put(user.getId(), user);
-        log.debug("Пользователь создан: '{}'",user);
+        log.debug("Пользователь создан: '{}'", user);
         return user;
     }
 
     @PutMapping(value = "/users")
+    @ResponseBody
     public User update(@Valid @RequestBody User user) {
         users.put(user.getId(), user);
-        log.debug("Пользователь обновлен: '{}'",user);
+        log.debug("Пользователь обновлен: '{}'", user);
         return user;
     }
 }

@@ -8,14 +8,14 @@ import java.time.LocalDate;
 
 @Data
 public class User {
-    private final Integer id;
+    private Integer id;
     @NotEmpty
     @Email
     private String email;
     @NotEmpty
-    @Pattern(regexp = "[^\\S]")
+    @Pattern(regexp = "[^\\s]+")
     private String login;
     private String name;
     @PastOrPresent
-    private final LocalDate birthday;
+    private LocalDate birthday;
 }
