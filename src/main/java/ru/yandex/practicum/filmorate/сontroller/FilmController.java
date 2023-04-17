@@ -29,10 +29,16 @@ public class FilmController {
         ) {
             throw new ValidationException();
         }
-        film.setId(++idCounter);
-        films.put(film.getId(), film);
-        log.debug("Фильм создан: '{}'", film);
-        return film;
+        Film resultFilm = Film.builder()
+                .id(++idCounter)
+                .name(film.getName())
+                .description(film.getDescription())
+                .releaseDate(film.getReleaseDate())
+                .duration(film.getDuration())
+                .build();
+        films.put(resultFilm.getId(), resultFilm);
+        log.debug("Фильм создан: '{}'", resultFilm);
+        return resultFilm;
     }
 
     @PutMapping(value = "/films")

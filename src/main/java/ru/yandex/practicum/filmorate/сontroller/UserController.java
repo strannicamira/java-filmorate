@@ -23,13 +23,22 @@ public class UserController {
     @PostMapping(value = "/users")
     @ResponseBody
     public User create(@Valid @RequestBody User user) {
+        String userName;
         if (user.getName() == null || user.getName().isEmpty()) {
-            user.setName(user.getLogin());
+            userName = user.getLogin();
+        } else {
+            userName = user.getName();
         }
-        user.setId(++idCounter);
-        users.put(user.getId(), user);
-        log.debug("Пользователь создан: '{}'", user);
-        return user;
+        final User resultUser = User.builder()
+                .id(++idCounter)
+                .email(user.getEmail())
+                .name(userName)
+                .login(user.getLogin())
+                .birthday(user.getBirthday())
+                .build();
+        users.put(resultUser.getId(), resultUser);
+        log.debug("Пользователь создан: '{}'", resultUser);
+        return resultUser;
     }
 
     @PutMapping(value = "/users")
