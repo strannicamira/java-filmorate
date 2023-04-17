@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.сontroller.FilmController;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
