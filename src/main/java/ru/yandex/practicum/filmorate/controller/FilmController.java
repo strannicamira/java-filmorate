@@ -7,7 +7,10 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -17,8 +20,8 @@ public class FilmController {
     private Integer idCounter = 0;
 
     @GetMapping("/films")
-    public HashMap<Integer, Film> findAll() {
-        return films;
+    public List<Film> findAll() {
+        return new ArrayList<>(films.values());
     }
 
     @PostMapping(value = "/films")
@@ -44,8 +47,12 @@ public class FilmController {
     @PutMapping(value = "/films")
     @ResponseBody
     public Film update(@Valid @RequestBody Film film) {
-        films.put(film.getId(), film);
-        log.debug("Фильм обновлен: '{}'", film);
+        if (film != null && films.containsKey(film.getId())) {
+            films.put(film.getId(), film);
+            log.debug("Фильм обновлен: '{}'", film);
+        } else {
+            throw new ValidationException();
+        }
         return film;
     }
 }

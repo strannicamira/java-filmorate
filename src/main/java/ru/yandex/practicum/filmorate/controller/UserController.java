@@ -5,7 +5,11 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
+import javax.validation.ValidationException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @Slf4j
@@ -15,8 +19,8 @@ public class UserController {
     private Integer idCounter = 0;
 
     @GetMapping("/users")
-    public HashMap<Integer, User> findAll() {
-        return users;
+    public List<User> findAll() {
+        return new ArrayList<>(users.values());
     }
 
     @PostMapping(value = "/users")
@@ -43,8 +47,12 @@ public class UserController {
     @PutMapping(value = "/users")
     @ResponseBody
     public User update(@Valid @RequestBody User user) {
-        users.put(user.getId(), user);
-        log.debug("Пользователь обновлен: '{}'", user);
+        if (user != null && users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
+            log.debug("Пользователь обновлен: '{}'", user);
+        } else {
+            throw new ValidationException();
+        }
         return user;
     }
 }
