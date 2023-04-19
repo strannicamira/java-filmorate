@@ -9,13 +9,14 @@ import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @Slf4j
 public class FilmController {
 
-    private ConcurrentHashMap<Integer, Film> films = new ConcurrentHashMap<>();
+    private Map<Integer, Film> films = new ConcurrentHashMap<>();
     private Integer idCounter = 0;
 
     @GetMapping("/films")
@@ -29,8 +30,8 @@ public class FilmController {
         if (film.getDescription().length() > 200 ||
                 film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))
         ) {
-            log.warn("Фильм не создан. Не прошел проверку: '{}'", film);
-            throw new ValidationException();
+            throw new ValidationException("Фильм не создан. Не прошел " +
+                    "проверку.");
         }
         Film resultFilm = Film.builder()
                 .id(++idCounter)
@@ -51,8 +52,8 @@ public class FilmController {
             films.put(film.getId(), film);
             log.debug("Фильм обновлен: '{}'", film);
         } else {
-            log.warn("Фильм не обновлен. Не найден в списке: '{}'", film);
-            throw new ValidationException();
+            throw new ValidationException("Фильм не обновлен. Не найден в " +
+                    "списке.");
         }
         return film;
     }

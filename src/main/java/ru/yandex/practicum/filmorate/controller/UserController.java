@@ -9,13 +9,14 @@ import javax.validation.Valid;
 import javax.validation.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @Slf4j
 public class UserController {
 
-    private ConcurrentHashMap<Integer, User> users = new ConcurrentHashMap<>();
+    private Map<Integer, User> users = new ConcurrentHashMap<>();
     private Integer idCounter = 0;
 
     @GetMapping("/users")
@@ -49,9 +50,8 @@ public class UserController {
             users.put(user.getId(), user);
             log.debug("Пользователь обновлен: '{}'", user);
         } else {
-            log.warn("Пользователь не обновлен. Не найден в списке: '{}'",
-                    user);
-            throw new ValidationException();
+            throw new ValidationException("Пользователь не обновлен. Не " +
+                    "найден в списке.");
         }
         return user;
     }
