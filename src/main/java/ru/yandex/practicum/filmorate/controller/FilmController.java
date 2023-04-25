@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
 import javax.validation.ValidationException;
@@ -16,45 +17,27 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class FilmController {
 
-    private Map<Integer, Film> films = new ConcurrentHashMap<>();
-    private Integer idCounter = 0;
+    private final FilmStorage filmStorage;
+
+    public FilmController(FilmStorage filmStorage) {
+        this.filmStorage = filmStorage;
+    }
 
     @GetMapping("/films")
     public List<Film> findAll() {
-        return new ArrayList<>(films.values());
+
+        return filmStorage.findAll();
     }
 
     @PostMapping(value = "/films")
     @ResponseBody
     public Film create(@Valid @RequestBody Film film) {
-        if (film.getDescription().length() > 200 ||
-                film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))
-        ) {
-            throw new ValidationException("Фильм не создан. Не прошел " +
-                    "проверку.");
-        }
-        Film resultFilm = Film.builder()
-                .id(++idCounter)
-                .name(film.getName())
-                .description(film.getDescription())
-                .releaseDate(film.getReleaseDate())
-                .duration(film.getDuration())
-                .build();
-        films.put(resultFilm.getId(), resultFilm);
-        log.debug("Фильм создан: '{}'", resultFilm);
-        return resultFilm;
+        return filmStorage.create(film);
     }
 
     @PutMapping(value = "/films")
     @ResponseBody
     public Film update(@Valid @RequestBody Film film) {
-        if (film != null && films.containsKey(film.getId())) {
-            films.put(film.getId(), film);
-            log.debug("Фильм обновлен: '{}'", film);
-        } else {
-            throw new ValidationException("Фильм не обновлен. Не найден в " +
-                    "списке.");
-        }
-        return film;
+        return filmStorage.update(film);
     }
 }
