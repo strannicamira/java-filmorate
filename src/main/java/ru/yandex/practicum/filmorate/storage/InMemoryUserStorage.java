@@ -1,7 +1,53 @@
 package ru.yandex.practicum.filmorate.storage;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.model.User;
+
+import javax.validation.ValidationException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class InMemoryUserStorage {
+@Slf4j
+public class InMemoryUserStorage implements UserStorage{
+
+    private Map<Integer, User> users = new ConcurrentHashMap<>();
+    private Integer idCounter = 0;
+
+    public List<User> findAll() {
+
+        return new ArrayList<>(users.values());
+    }
+
+    public User create(User user) {
+        String userName = user.getName();
+        if (!StringUtils.hasText(userName)) {
+            userName = user.getLogin();
+        }
+        final User resultUser = User.builder()
+                .id(++idCounter)
+                .email(user.getEmail())
+                .name(userName)
+                .login(user.getLogin())
+                .birthday(user.getBirthday())
+                .build();
+        users.put(resultUser.getId(), resultUser);
+        log.debug("Пользователь создан: '{}'", resultUser);
+        return resultUser;
+    }
+
+    public User update(User user) {
+        if (user != null && users.containsKey(user.getId())) {
+            users.put(user.getId(), user);
+            log.debug("Пользователь обновлен: '{}'", user);
+        } else {
+            throw new ValidationException("Пользователь не обновлен. Не " +
+                    "найден в списке.");
+        }
+        return user;
+    }
 }
