@@ -44,3 +44,9 @@ build/
 
 *.db
 db/*
+
+#For Pull Request to GitHub
+mvnw
+mvnw.cmd
+.mvn
+
