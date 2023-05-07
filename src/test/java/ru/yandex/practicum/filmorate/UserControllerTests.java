@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
@@ -14,7 +15,9 @@ import java.time.LocalDate;
 class UserControllerTests {
 
     private UserStorage userStorage = new InMemoryUserStorage();
-    UserController userController = new UserController(userStorage);
+    private UserService userService = new UserService(userStorage);
+
+    UserController userController = new UserController(userStorage, userService);
 
     @Test
     void create() {
@@ -33,7 +36,7 @@ class UserControllerTests {
                 .birthday(LocalDate.of(1964, 8, 20))
                 .build();
         User resultUser = userController.create(testedUser);
-        Assertions.assertEquals(expectedUser,resultUser);
+        Assertions.assertEquals(expectedUser, resultUser);
     }
 
     @Test
@@ -53,7 +56,7 @@ class UserControllerTests {
                 .build();
 
         User resultUser = userController.create(testedUser);
-        Assertions.assertEquals(expectedUser,resultUser);
+        Assertions.assertEquals(expectedUser, resultUser);
     }
 
 }

@@ -15,14 +15,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class InMemoryUserStorage implements UserStorage{
 
+
+
     private Map<Integer, User> users = new ConcurrentHashMap<>();
     private Integer idCounter = 0;
 
+    public Map<Integer, User> getUsers() {
+        return users;
+    }
+    @Override
     public List<User> findAll() {
 
         return new ArrayList<>(users.values());
     }
 
+    @Override
     public User create(User user) {
         String userName = user.getName();
         if (!StringUtils.hasText(userName)) {
@@ -40,6 +47,7 @@ public class InMemoryUserStorage implements UserStorage{
         return resultUser;
     }
 
+    @Override
     public User update(User user) {
         if (user != null && users.containsKey(user.getId())) {
             users.put(user.getId(), user);
@@ -49,5 +57,13 @@ public class InMemoryUserStorage implements UserStorage{
                     "найден в списке.");
         }
         return user;
+    }
+
+    @Override
+    public User findUserById(Integer id) {
+        if (id == null) {
+            return null;
+        }
+        return users.get(id);
     }
 }
