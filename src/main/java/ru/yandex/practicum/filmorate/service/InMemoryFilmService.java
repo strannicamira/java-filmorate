@@ -15,7 +15,7 @@ import static ru.yandex.practicum.filmorate.Constants.ASCENDING_ORDER;
 @Service
 public class InMemoryFilmService implements FilmService {
 
-    private final static String sort = DESCENDING_ORDER;
+    private static final String sort = DESCENDING_ORDER;
     private final FilmStorage filmStorage;
 
     public InMemoryFilmService(FilmStorage filmStorage) {
