@@ -5,7 +5,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -29,7 +28,7 @@ public class UserService {
 
     public List<User> getFriends(Integer userId) {
         List<User> friends = new ArrayList<>();
-        for(Integer id: userStorage.getUsers().get(userId).getFriends()){
+        for (Integer id : userStorage.getUsers().get(userId).getFriends()) {
             friends.add(userStorage.getUsers().get(id));
         }
         return friends;
@@ -37,12 +36,12 @@ public class UserService {
 
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
         List<User> friends = new ArrayList<>();
-        for(Integer id: userStorage.getUsers().get(userId).getFriends()){
-            for(Integer other:
+        for (Integer id : userStorage.getUsers().get(userId).getFriends()) {
+            for (Integer other :
                     userStorage.getUsers().get(otherId).getFriends())
-            if(id==other){
-                friends.add(userStorage.getUsers().get(id));
-            }
+                if (id == other) {
+                    friends.add(userStorage.getUsers().get(id));
+                }
         }
         return friends;
     }

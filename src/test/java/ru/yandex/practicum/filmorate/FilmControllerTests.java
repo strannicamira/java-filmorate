@@ -12,6 +12,7 @@ import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
+import java.util.Collections;
 
 @SpringBootTest
 class FilmControllerTests {
@@ -34,6 +35,7 @@ class FilmControllerTests {
                 .description("adipisicing")
                 .releaseDate(LocalDate.of(1967, 3, 25))
                 .duration(200)
+                .likes(Collections.emptySet())
                 .build();
 
         Film resultFilm = filmController.create(testedFilm);

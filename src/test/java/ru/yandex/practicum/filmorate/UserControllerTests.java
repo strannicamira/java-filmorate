@@ -10,6 +10,8 @@ import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.Collections;
 
 @SpringBootTest
 class UserControllerTests {
@@ -34,6 +36,7 @@ class UserControllerTests {
                 .login("dolore")
                 .name("Nick Name")
                 .birthday(LocalDate.of(1964, 8, 20))
+                .friends(Collections.emptySet())
                 .build();
         User resultUser = userController.create(testedUser);
         Assertions.assertEquals(expectedUser, resultUser);
@@ -53,6 +56,7 @@ class UserControllerTests {
                 .login("common")
                 .name("common")
                 .birthday(LocalDate.of(2000, 8, 20))
+                .friends(Collections.emptySet())
                 .build();
 
         User resultUser = userController.create(testedUser);

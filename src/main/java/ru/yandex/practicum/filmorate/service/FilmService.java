@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.Constants;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -42,7 +41,6 @@ public class FilmService {
                 .limit(count)
                 .collect(Collectors.toList());
     }
-
 
     private int compare(Film f0, Film f1, String sort) {
         int result = f0.getLikes().size() - (f1.getLikes().size());
