@@ -13,32 +13,30 @@ import java.util.List;
 @Slf4j
 public class FilmController {
 
-    private final FilmStorage filmStorage;
     private final InMemoryFilmService filmService;
 
-    public FilmController(FilmStorage filmStorage, InMemoryFilmService filmService) {
-        this.filmStorage = filmStorage;
+    public FilmController(InMemoryFilmService filmService) {
         this.filmService = filmService;
     }
 
     @GetMapping("/films")
     public List<Film> findAll() {
-        return filmStorage.findAll();
+        return filmService.findAll();
     }
 
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) {
-        return filmStorage.create(film);
+        return filmService.create(film);
     }
 
     @PutMapping(value = "/films")
     public Film update(@Valid @RequestBody Film film) {
-        return filmStorage.update(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/films/{id}")
     public Film getFilm(@PathVariable("id") Integer id) {
-        return filmStorage.findFilmById(id);
+        return filmService.findFilmById(id);
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")

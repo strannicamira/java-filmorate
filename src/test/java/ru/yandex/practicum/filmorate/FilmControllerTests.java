@@ -18,7 +18,7 @@ import java.util.Collections;
 class FilmControllerTests {
     FilmStorage filmStorage = new InMemoryFilmStorage();
     InMemoryFilmService filmService = new InMemoryFilmService(filmStorage);
-    FilmController filmController = new FilmController(filmStorage, filmService);
+    FilmController filmController = new FilmController(filmService);
 
     @Test
     void create() {

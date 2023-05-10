@@ -5,7 +5,9 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class InMemoryUserService implements UserService {
@@ -48,5 +50,30 @@ public class InMemoryUserService implements UserService {
                 }
         }
         return friends;
+    }
+
+    @Override
+    public Map<Integer, User> getUsers() {
+        return userStorage.getUsers();
+    }
+
+    @Override
+    public Collection<User> findAll() {
+        return userStorage.findAll();
+    }
+
+    @Override
+    public User create(User user) {
+        return userStorage.create(user);
+    }
+
+    @Override
+    public User update(User user) {
+        return userStorage.update(user);
+    }
+
+    @Override
+    public User findUserById(Integer id) {
+        return userStorage.findUserById(id);
     }
 }

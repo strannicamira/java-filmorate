@@ -5,6 +5,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
@@ -56,5 +57,30 @@ public class InMemoryFilmService implements FilmService {
                 break;
         }
         return result;
+    }
+
+    @Override
+    public Map<Integer, Film> getFilms() {
+        return filmStorage.getFilms();
+    }
+
+    @Override
+    public List<Film> findAll() {
+        return filmStorage.findAll();
+    }
+
+    @Override
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    @Override
+    public Film update(Film film) {
+        return filmStorage.update(film);
+    }
+
+    @Override
+    public Film findFilmById(Integer id) {
+        return filmStorage.findFilmById(id);
     }
 }

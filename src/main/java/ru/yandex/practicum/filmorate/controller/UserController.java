@@ -13,32 +13,30 @@ import java.util.List;
 @Slf4j
 public class UserController {
 
-    private final UserStorage userStorage;
     private final InMemoryUserService userService;
 
-    public UserController(UserStorage userStorage, InMemoryUserService userService) {
-        this.userStorage = userStorage;
+    public UserController(InMemoryUserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/users")
     public List<User> findAll() {
-        return (List<User>) userStorage.findAll();
+        return (List<User>) userService.findAll();
     }
 
     @PostMapping(value = "/users")
     public User create(@Valid @RequestBody User user) {
-        return userStorage.create(user);
+        return userService.create(user);
     }
 
     @PutMapping(value = "/users")
     public User update(@Valid @RequestBody User user) {
-        return userStorage.update(user);
+        return userService.update(user);
     }
 
     @GetMapping("/users/{id}")
     public User getUser(@PathVariable("id") Integer id){
-        return userStorage.findUserById(id);
+        return userService.findUserById(id);
     }
 
     @PutMapping(value = "/users/{id}/friends/{friendId}")
