@@ -6,7 +6,7 @@ import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
@@ -17,7 +17,7 @@ import java.util.Collections;
 @SpringBootTest
 class FilmControllerTests {
     FilmStorage filmStorage = new InMemoryFilmStorage();
-    FilmService filmService = new FilmService(filmStorage);
+    InMemoryFilmService filmService = new InMemoryFilmService(filmStorage);
     FilmController filmController = new FilmController(filmStorage, filmService);
 
     @Test

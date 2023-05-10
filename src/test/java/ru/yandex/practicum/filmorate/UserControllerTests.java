@@ -5,19 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.service.InMemoryUserService;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.time.LocalDate;
-import java.util.Collection;
 import java.util.Collections;
 
 @SpringBootTest
 class UserControllerTests {
 
     private UserStorage userStorage = new InMemoryUserStorage();
-    private UserService userService = new UserService(userStorage);
+    private InMemoryUserService userService = new InMemoryUserService(userStorage);
 
     UserController userController = new UserController(userStorage, userService);
 

@@ -3,7 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import javax.validation.Valid;
@@ -14,9 +14,9 @@ import java.util.List;
 public class FilmController {
 
     private final FilmStorage filmStorage;
-    private final FilmService filmService;
+    private final InMemoryFilmService filmService;
 
-    public FilmController(FilmStorage filmStorage, FilmService filmService) {
+    public FilmController(FilmStorage filmStorage, InMemoryFilmService filmService) {
         this.filmStorage = filmStorage;
         this.filmService = filmService;
     }
