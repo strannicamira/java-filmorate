@@ -15,8 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 @Slf4j
-public class InMemoryUserStorage implements UserStorage{
-
+public class InMemoryUserStorage implements UserStorage {
 
 
     private Map<Integer, User> users = new ConcurrentHashMap<>();
@@ -25,6 +24,7 @@ public class InMemoryUserStorage implements UserStorage{
     public Map<Integer, User> getUsers() {
         return users;
     }
+
     @Override
     public List<User> findAll() {
 
@@ -64,9 +64,10 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
     public User findUserById(Integer id) {
-        if (id == null) {
-            return null;
+        if (id != null && users.containsKey(id)) {
+            return users.get(id);
+        } else {
+            throw new NotFoundException("Пользователь не найден в списке.");
         }
-        return users.get(id);
     }
 }

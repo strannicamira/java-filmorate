@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -34,6 +35,11 @@ public class FilmController {
     @PutMapping(value = "/films")
     public Film update(@Valid @RequestBody Film film) {
         return filmStorage.update(film);
+    }
+
+    @GetMapping("/films/{id}")
+    public Film getFilm(@PathVariable("id") Integer id){
+        return filmStorage.findFilmById(id);
     }
 
     @PutMapping(value = "/films/{id}/like/{userId}")

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -59,5 +60,14 @@ public class InMemoryFilmStorage implements FilmStorage {
                     "списке.");
         }
         return film;
+    }
+
+    @Override
+    public Film findFilmById(Integer id) {
+        if (id != null && films.containsKey(id)) {
+            return films.get(id);
+        } else {
+            throw new NotFoundException("Фильм не найден в списке.");
+        }
     }
 }
