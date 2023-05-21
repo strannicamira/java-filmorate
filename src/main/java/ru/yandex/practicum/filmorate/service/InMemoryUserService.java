@@ -58,11 +58,11 @@ public class InMemoryUserService implements UserService {
         List<User> friends = Collections.emptyList();
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId) && otherId != null && users.containsKey(otherId)) {
-            for (Integer id : userStorage.getUsers().get(userId).getFriends()) {
+            for (Integer id : users.get(userId).getFriends()) {
                 for (Integer other :
-                        userStorage.getUsers().get(otherId).getFriends())
+                        users.get(otherId).getFriends())
                     if (id == other) {
-                        friends.add(userStorage.getUsers().get(id));
+                        friends.add(users.get(id));
                     }
             }
             return friends;

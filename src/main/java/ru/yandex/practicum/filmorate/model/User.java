@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.model;
 import lombok.Builder;
 import lombok.Value;
 
-import javax.validation.constraints.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
 @Value
-@Builder
+@Builder(toBuilder = true)
 public class User {
     private Integer id;
     @NotEmpty
@@ -21,4 +25,12 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
     private Set<Integer> friends;
+
+    public Set<Integer> getFriends() {
+        if (friends == null) {
+            return new HashSet<>();
+        } else {
+            return friends;
+        }
+    }
 }

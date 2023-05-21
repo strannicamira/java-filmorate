@@ -6,10 +6,7 @@ import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -36,13 +33,10 @@ public class InMemoryUserStorage implements UserStorage {
         if (!StringUtils.hasText(userName)) {
             userName = user.getLogin();
         }
-        final User resultUser = User.builder()
+
+        final User resultUser = user.toBuilder()
                 .id(++idCounter)
-                .email(user.getEmail())
                 .name(userName)
-                .login(user.getLogin())
-                .birthday(user.getBirthday())
-                .friends(new HashSet<>())
                 .build();
         users.put(resultUser.getId(), resultUser);
         log.debug("Пользователь создан: '{}'", resultUser);
