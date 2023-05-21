@@ -6,9 +6,9 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.List;
 
 public interface UserService extends UserStorage {
-    boolean addFriend(Integer userId, Integer friendId);
+    User addFriend(Integer userId, Integer friendId);
 
-    boolean deleteFriend(Integer userId, Integer friendId);
+    User deleteFriend(Integer userId, Integer friendId);
 
     List<User> getFriends(Integer userId);
 

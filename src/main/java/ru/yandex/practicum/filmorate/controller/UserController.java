@@ -39,13 +39,13 @@ public class UserController {
     }
 
     @PutMapping(value = "/users/{id}/friends/{friendId}")
-    public boolean addFriend(@PathVariable("id") Integer userId,
+    public User addFriend(@PathVariable("id") Integer userId,
                              @PathVariable("friendId") Integer friendId) {
         return userService.addFriend(userId, friendId);
     }
 
     @DeleteMapping(value = "/users/{id}/friends/{friendId}")
-    public boolean deleteFriend(@PathVariable("id") Integer userId,
+    public User deleteFriend(@PathVariable("id") Integer userId,
                                 @PathVariable("friendId") Integer friendId) {
         return userService.deleteFriend(userId, friendId);
     }

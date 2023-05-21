@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -8,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.*;
 
 @Service
+@Slf4j
 public class InMemoryUserService implements UserService {
 
     private final UserStorage userStorage;
@@ -17,26 +19,33 @@ public class InMemoryUserService implements UserService {
     }
 
     @Override
-    public boolean addFriend(Integer userId, Integer friendId) {
+    public User addFriend(Integer userId, Integer friendId) {
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId) && friendId != null && users.containsKey(friendId)) {
-            return users.get(userId).getFriends().add(friendId) &&
-                    users.get(friendId).getFriends().add(userId);
+            if(users.get(userId).getFriends().add(friendId) &&
+                    users.get(friendId).getFriends().add(userId)){
+                log.debug("Друг добавлен: '{}'", users.get(userId));
+                return users.get(userId);
+            }
         } else {
             throw new NotFoundException("Пользователь не найден в списке.");
         }
+        return null;
     }
 
     @Override
-    public boolean deleteFriend(Integer userId, Integer friendId) {
+    public User deleteFriend(Integer userId, Integer friendId) {
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId) && friendId != null && users.containsKey(friendId)) {
-            return users.get(userId).getFriends().remove(friendId) &&
-                    users.get(friendId).getFriends().remove(userId);
+            if(users.get(userId).getFriends().remove(friendId) &&
+                    users.get(friendId).getFriends().remove(userId)){
+                log.debug("Друг удален: '{}'", users.get(userId));
+                return users.get(userId);
+            }
         } else {
             throw new NotFoundException("Пользователь не найден в списке.");
         }
-
+        return null;
     }
 
     @Override
