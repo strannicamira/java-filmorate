@@ -5,10 +5,7 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class InMemoryUserService implements UserService {
@@ -26,7 +23,7 @@ public class InMemoryUserService implements UserService {
             return users.get(userId).getFriends().add(friendId) &&
                     users.get(friendId).getFriends().add(userId);
         } else {
-            throw new NotFoundException("Пользователь найден в списке.");
+            throw new NotFoundException("Пользователь не найден в списке.");
         }
     }
 
@@ -37,14 +34,14 @@ public class InMemoryUserService implements UserService {
             return users.get(userId).getFriends().remove(friendId) &&
                     users.get(friendId).getFriends().remove(userId);
         } else {
-            throw new NotFoundException("Пользователь найден в списке.");
+            throw new NotFoundException("Пользователь не найден в списке.");
         }
 
     }
 
     @Override
     public List<User> getFriends(Integer userId) {
-        List<User> friends = new ArrayList<>();
+        List<User> friends = Collections.emptyList();
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId)) {
             for (Integer id : users.get(userId).getFriends()) {
@@ -58,7 +55,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
-        List<User> friends = new ArrayList<>();
+        List<User> friends = Collections.emptyList();
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId) && otherId != null && users.containsKey(otherId)) {
             for (Integer id : userStorage.getUsers().get(userId).getFriends()) {
@@ -70,7 +67,7 @@ public class InMemoryUserService implements UserService {
             }
             return friends;
         } else {
-            throw new NotFoundException("Пользователь найден в списке.");
+            throw new NotFoundException("Пользователь не найден в списке.");
         }
 
     }
