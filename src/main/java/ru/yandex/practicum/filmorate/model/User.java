@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Value
-@Builder(toBuilder = true)
+@Builder
 public class User {
     private Integer id;
     @NotEmpty

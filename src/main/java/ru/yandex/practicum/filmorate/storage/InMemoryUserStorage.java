@@ -34,9 +34,13 @@ public class InMemoryUserStorage implements UserStorage {
             userName = user.getLogin();
         }
 
-        final User resultUser = user.toBuilder()
+        final User resultUser = User.builder()
                 .id(++idCounter)
+                .email(user.getEmail())
                 .name(userName)
+                .login(user.getLogin())
+                .birthday(user.getBirthday())
+                .friends(user.getFriends())
                 .build();
         users.put(resultUser.getId(), resultUser);
         log.debug("Пользователь создан: '{}'", resultUser);
