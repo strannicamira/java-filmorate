@@ -41,7 +41,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        List<User> friends = Collections.emptyList();
+        List<User> friends = new ArrayList<>();
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId)) {
             for (Integer id : users.get(userId).getFriends()) {
@@ -55,7 +55,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
-        List<User> friends = Collections.emptyList();
+        List<User> friends = new ArrayList<>();
         Map<Integer, User> users = userStorage.getUsers();
         if (userId != null && users.containsKey(userId) && otherId != null && users.containsKey(otherId)) {
             for (Integer id : users.get(userId).getFriends()) {
