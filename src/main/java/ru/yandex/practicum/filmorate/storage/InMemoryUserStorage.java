@@ -35,7 +35,7 @@ public class InMemoryUserStorage implements UserStorage {
         }
 
         final User resultUser = User.builder()
-                .id(++idCounter)
+                .id(idCounter++)
                 .email(user.getEmail())
                 .name(userName)
                 .login(user.getLogin())
