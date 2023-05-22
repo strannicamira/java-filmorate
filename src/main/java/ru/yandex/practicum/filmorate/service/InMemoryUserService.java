@@ -24,7 +24,7 @@ public class InMemoryUserService implements UserService {
         if (userId != null && users.containsKey(userId) && friendId != null && users.containsKey(friendId)) {
             if (users.get(userId).getFriends().add(friendId) &&
                     users.get(friendId).getFriends().add(userId)) {
-                log.debug("Друг добавлен: '{}'", users.get(userId));
+                log.debug("угДр добавлен: '{}'", users.get(userId));
                 return users.get(userId);
             }
         } else {
