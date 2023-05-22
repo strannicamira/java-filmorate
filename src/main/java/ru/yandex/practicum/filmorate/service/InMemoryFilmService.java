@@ -24,14 +24,14 @@ public class InMemoryFilmService implements FilmService {
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilms().get(filmId);
+        Film film = findFilmById(filmId);
         film.getLikes().add(userId);
         return film;
     }
 
     @Override
     public Film deleteLike(Integer filmId, Integer userId) {
-        Film film = filmStorage.getFilms().get(filmId);
+        Film film = findFilmById(filmId);
         film.getLikes().remove(userId);
         return film;
     }
