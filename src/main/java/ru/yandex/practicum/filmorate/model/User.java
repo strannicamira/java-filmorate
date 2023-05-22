@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -14,7 +13,6 @@ import java.util.Set;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class User {
     private Integer id;
     @NotEmpty
@@ -26,22 +24,12 @@ public class User {
     private String name;
     @PastOrPresent
     private LocalDate birthday;
-    //@Builder.Default
     private Set<Integer> friends;
 
     public Set<Integer> getFriends() {
         if (friends == null) {
             friends = new HashSet<>();
-            return friends;
-        } else {
-            return friends;
         }
+        return friends;
     }
-/*    public void setFriends(Set<Integer> friends){
-        if (friends == null) {
-            this.friends = new HashSet<>();
-        } else {
-            this.friends = friends;
-        }
-    }*/
 }
