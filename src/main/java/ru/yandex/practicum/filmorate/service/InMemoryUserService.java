@@ -24,7 +24,7 @@ public class InMemoryUserService implements UserService {
         if (userId != null && users.containsKey(userId) && friendId != null && users.containsKey(friendId)) {
             if (users.get(userId).getFriends().add(friendId) &&
                     users.get(friendId).getFriends().add(userId)) {
-                log.debug("угДр добавлен: '{}'", users.get(userId));
+                log.debug("Друг добавлен: '{}'", users.get(userId));
                 return users.get(userId);
             }
         } else {
@@ -36,49 +36,37 @@ public class InMemoryUserService implements UserService {
     @Override
     public User deleteFriend(Integer userId, Integer friendId) {
         Map<Integer, User> users = userStorage.getUsers();
-        if (userId != null && users.containsKey(userId) && friendId != null && users.containsKey(friendId)) {
-            if (users.get(userId).getFriends().remove(friendId) &&
-                    users.get(friendId).getFriends().remove(userId)) {
-                log.debug("Друг удален: '{}'", users.get(userId));
-                return users.get(userId);
-            }
+        if (findUserById(userId).getFriends().remove(friendId) &&
+                findUserById(friendId).getFriends().remove(userId)) {
+            log.debug("Друг удален: '{}'", users.get(userId));
+            return findUserById(userId);
         } else {
-            throw new NotFoundException("Пользователь не найден в списке.");
+            throw new NotFoundException("Пользователя не удалось удалить " +
+                    "из друзей.");
         }
-        return null;
     }
 
     @Override
     public List<User> getFriends(Integer userId) {
         List<User> friends = new ArrayList<>();
         Map<Integer, User> users = userStorage.getUsers();
-        if (userId != null && users.containsKey(userId)) {
-            for (Integer id : users.get(userId).getFriends()) {
-                friends.add(users.get(id));
-            }
-            return friends;
-        } else {
-            throw new NotFoundException("Пользователь не найден в списке.");
+        for (Integer id : findUserById(userId).getFriends()) {
+            friends.add(users.get(id));
         }
+        return friends;
     }
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
         List<User> friends = new ArrayList<>();
         Map<Integer, User> users = userStorage.getUsers();
-        if (userId != null && users.containsKey(userId) && otherId != null && users.containsKey(otherId)) {
-            for (Integer id : users.get(userId).getFriends()) {
-                for (Integer other :
-                        users.get(otherId).getFriends())
-                    if (id == other) {
-                        friends.add(users.get(id));
-                    }
-            }
-            return friends;
-        } else {
-            throw new NotFoundException("Пользователь не найден в списке.");
+        for (Integer id : findUserById(userId).getFriends()) {
+            for (Integer other : findUserById(otherId).getFriends())
+                if (id == other) {
+                    friends.add(users.get(id));
+                }
         }
-
+        return friends;
     }
 
     @Override

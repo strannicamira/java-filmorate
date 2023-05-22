@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
@@ -13,6 +15,7 @@ import static ru.yandex.practicum.filmorate.Constants.ASCENDING_ORDER;
 
 
 @Service
+@Slf4j
 public class InMemoryFilmService implements FilmService {
 
     private static final String sort = DESCENDING_ORDER;
@@ -32,8 +35,12 @@ public class InMemoryFilmService implements FilmService {
     @Override
     public Film deleteLike(Integer filmId, Integer userId) {
         Film film = findFilmById(filmId);
-        film.getLikes().remove(userId);
-        return film;
+        if (film.getLikes().remove(userId)) {
+            log.debug("Отметка удалена: '{}'", film);
+            return film;
+        } else {
+            throw new NotFoundException("Отметку не удалось удалить.");
+        }
     }
 
     @Override
