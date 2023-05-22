@@ -6,9 +6,9 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import java.util.List;
 
 public interface FilmService extends FilmStorage {
-    boolean addLike(Integer filmId, Integer userId);
+    Film addLike(Integer filmId, Integer userId);
 
-    boolean deleteLike(Integer filmId, Integer userId);
+    Film deleteLike(Integer filmId, Integer userId);
 
     List<Film> findTopLiked(Integer count);
 }

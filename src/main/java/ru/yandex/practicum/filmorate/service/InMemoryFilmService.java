@@ -23,17 +23,17 @@ public class InMemoryFilmService implements FilmService {
     }
 
     @Override
-    public boolean addLike(Integer filmId, Integer userId) {
-        return filmStorage
-                .getFilms()
-                .get(filmId)
-                .getLikes()
-                .add(userId);
+    public Film addLike(Integer filmId, Integer userId) {
+        Film film = filmStorage.getFilms().get(filmId);
+        film.getLikes().add(userId);
+        return film;
     }
 
     @Override
-    public boolean deleteLike(Integer filmId, Integer userId) {
-        return filmStorage.getFilms().get(filmId).getLikes().remove(userId);
+    public Film deleteLike(Integer filmId, Integer userId) {
+        Film film = filmStorage.getFilms().get(filmId);
+        film.getLikes().remove(userId);
+        return film;
     }
 
     @Override

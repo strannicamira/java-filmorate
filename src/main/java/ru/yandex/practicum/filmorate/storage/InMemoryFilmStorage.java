@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.model.Film;
 import javax.validation.ValidationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,7 +42,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .description(film.getDescription())
                 .releaseDate(film.getReleaseDate())
                 .duration(film.getDuration())
-                .likes(new HashSet<>())
+                .likes(film.getLikes())
                 .build();
         films.put(resultFilm.getId(), resultFilm);
         log.debug("Фильм создан: '{}'", resultFilm);
