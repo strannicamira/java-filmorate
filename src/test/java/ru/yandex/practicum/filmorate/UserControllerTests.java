@@ -29,7 +29,7 @@ class UserControllerTests {
                 .build();
 
         User expectedUser = User.builder()
-                .id(0)
+                .id(1)
                 .email("mail@mail.ru")
                 .login("dolore")
                 .name("Nick Name")
@@ -49,7 +49,7 @@ class UserControllerTests {
                 .build();
 
         User expectedUser = User.builder()
-                .id(0)
+                .id(1)
                 .email("friend@common.ru")
                 .login("common")
                 .name("common")
