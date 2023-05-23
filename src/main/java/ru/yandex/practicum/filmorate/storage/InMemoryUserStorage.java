@@ -67,4 +67,16 @@ public class InMemoryUserStorage implements UserStorage {
             throw new NotFoundException("Пользователь не найден в списке.");
         }
     }
+
+    @Override
+    public List<User> getCommonFriends(Integer userId, Integer otherId) {
+        List<User> friends = new ArrayList<>();
+        for (Integer id : findUserById(userId).getFriends()) {
+            for (Integer other : findUserById(otherId).getFriends())
+                if (id == other) {
+                    friends.add(users.get(id));
+                }
+        }
+        return friends;
+    }
 }

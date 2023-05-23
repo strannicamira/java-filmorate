@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,13 +11,10 @@ import java.util.List;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class FilmController {
 
     private final InMemoryFilmService filmService;
-
-    public FilmController(InMemoryFilmService filmService) {
-        this.filmService = filmService;
-    }
 
     @GetMapping("/films")
     public List<Film> findAll() {

@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -10,13 +11,10 @@ import java.util.*;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class InMemoryUserService implements UserService {
 
     private final UserStorage userStorage;
-
-    public InMemoryUserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     @Override
     public User addFriend(Integer userId, Integer friendId) {
@@ -58,15 +56,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
-        List<User> friends = new ArrayList<>();
-        Map<Integer, User> users = userStorage.getUsers();
-        for (Integer id : findUserById(userId).getFriends()) {
-            for (Integer other : findUserById(otherId).getFriends())
-                if (id == other) {
-                    friends.add(users.get(id));
-                }
-        }
-        return friends;
+        return userStorage.getCommonFriends(userId,otherId);
     }
 
     @Override

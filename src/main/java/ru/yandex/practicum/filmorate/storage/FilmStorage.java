@@ -16,4 +16,6 @@ public interface FilmStorage {
     Film update(Film film);
 
     Film findFilmById(Integer id);
+
+     List<Film> findTopLiked(Integer count);
 }
