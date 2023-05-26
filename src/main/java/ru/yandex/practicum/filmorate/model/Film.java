@@ -20,7 +20,8 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Integer> likes;
-
+    private Category category;
+    private Rating rating;
     public Set<Integer> getLikes() {
         if (likes == null) {
             likes = new HashSet<>();
