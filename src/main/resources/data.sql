@@ -1,0 +1,4 @@
+INSERT INTO PUBLIC.CATEGORIES
+(NAME)
+VALUES('Комедия'),
+VALUES('Драма');
