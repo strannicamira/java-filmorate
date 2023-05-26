@@ -6,13 +6,19 @@ import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
+import ru.yandex.practicum.filmorate.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
+import java.util.Collections;
 
 @SpringBootTest
 class FilmControllerTests {
-    FilmController filmController = new FilmController();
+    FilmStorage filmStorage = new InMemoryFilmStorage();
+    InMemoryFilmService filmService = new InMemoryFilmService(filmStorage);
+    FilmController filmController = new FilmController(filmService);
 
     @Test
     void create() {
@@ -29,6 +35,7 @@ class FilmControllerTests {
                 .description("adipisicing")
                 .releaseDate(LocalDate.of(1967, 3, 25))
                 .duration(200)
+                .likes(Collections.emptySet())
                 .build();
 
         Film resultFilm = filmController.create(testedFilm);

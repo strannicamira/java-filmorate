@@ -1,58 +1,61 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.InMemoryUserService;
 
 import javax.validation.Valid;
-import javax.validation.ValidationException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
-    private Map<Integer, User> users = new ConcurrentHashMap<>();
-    private Integer idCounter = 0;
+    private final InMemoryUserService userService;
 
     @GetMapping("/users")
     public List<User> findAll() {
-        return new ArrayList<>(users.values());
+        return (List<User>) userService.findAll();
     }
 
     @PostMapping(value = "/users")
-    @ResponseBody
     public User create(@Valid @RequestBody User user) {
-        String userName = user.getName();
-        if (!StringUtils.hasText(userName)) {
-            userName = user.getLogin();
-        }
-        final User resultUser = User.builder()
-                .id(++idCounter)
-                .email(user.getEmail())
-                .name(userName)
-                .login(user.getLogin())
-                .birthday(user.getBirthday())
-                .build();
-        users.put(resultUser.getId(), resultUser);
-        log.debug("Пользователь создан: '{}'", resultUser);
-        return resultUser;
+        return userService.create(user);
     }
 
     @PutMapping(value = "/users")
-    @ResponseBody
     public User update(@Valid @RequestBody User user) {
-        if (user != null && users.containsKey(user.getId())) {
-            users.put(user.getId(), user);
-            log.debug("Пользователь обновлен: '{}'", user);
-        } else {
-            throw new ValidationException("Пользователь не обновлен. Не " +
-                    "найден в списке.");
-        }
-        return user;
+        return userService.update(user);
+    }
+
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable("id") Integer id) {
+        return userService.findUserById(id);
+    }
+
+    @PutMapping(value = "/users/{id}/friends/{friendId}")
+    public User addFriend(@PathVariable("id") Integer userId,
+                             @PathVariable("friendId") Integer friendId) {
+        return userService.addFriend(userId, friendId);
+    }
+
+    @DeleteMapping(value = "/users/{id}/friends/{friendId}")
+    public User deleteFriend(@PathVariable("id") Integer userId,
+                                @PathVariable("friendId") Integer friendId) {
+        return userService.deleteFriend(userId, friendId);
+    }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> getFriends(@PathVariable("id") Integer userId) {
+        return userService.getFriends(userId);
+    }
+
+    @GetMapping(value = "/users/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriend(@PathVariable("id") Integer id,
+                                      @PathVariable("otherId") Integer otherId) {
+        return userService.getCommonFriends(id, otherId);
     }
 }
