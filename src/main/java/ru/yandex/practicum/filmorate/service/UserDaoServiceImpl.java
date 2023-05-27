@@ -39,4 +39,9 @@ public class UserDaoServiceImpl implements UserDaoService {
     public void addFriend(Integer userId, Integer friendId) {
         userDao.addFriend(userId,friendId);
     }
+
+    @Override
+    public List<User> getFriends(Integer userId) {
+        return userDao.getFriends(userId);
+    }
 }
