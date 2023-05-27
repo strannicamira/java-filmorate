@@ -14,4 +14,7 @@ public interface UserDao {
     Optional<User> findUserById(Integer id);
 
     void addFriend(Integer userId, Integer friendId);
+
+    List<User> getFriends(Integer userId);
+
 }

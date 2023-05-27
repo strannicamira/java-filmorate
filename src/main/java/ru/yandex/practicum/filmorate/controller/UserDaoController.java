@@ -42,4 +42,10 @@ public class UserDaoController {
                           @PathVariable("friendId") Integer friendId) {
         userDaoService.addFriend(userId, friendId);
     }
+
+    @GetMapping("/users/{id}/friends")
+    public List<User> getFriends(@PathVariable("id") Integer userId) {
+        return userDaoService.getFriends(userId);
+    }
+
 }
