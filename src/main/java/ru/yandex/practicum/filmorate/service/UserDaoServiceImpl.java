@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -29,4 +30,13 @@ public class UserDaoServiceImpl implements UserDaoService {
         userDao.update(user);
     }
 
+    @Override
+    public Optional<User> findUserById(Integer id) {
+        return userDao.findUserById(id);
+    }
+
+    @Override
+    public void addFriend(Integer userId, Integer friendId) {
+        userDao.addFriend(userId,friendId);
+    }
 }
