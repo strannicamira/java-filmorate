@@ -15,6 +15,7 @@ VALUES ('G'),
        ('R'),
        ('NC-17');
 
+/*
 INSERT INTO PUBLIC.FILMS
     (NAME, DESCRIPTION, RELEASE_DATE, DURATION)
 VALUES ('nisi eiusmod', 'adipisicing', '1967-03-25', 100), --"mpa": { "id": 1}
@@ -43,3 +44,4 @@ VALUES(1, 2, false),
 INSERT INTO PUBLIC.LIKES
 (FILM_ID, USER_ID)
 VALUES(2, 1);
+*/
