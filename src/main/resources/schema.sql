@@ -1,50 +1,49 @@
 --DROP ALL OBJECTS DELETE FILES;
 
---DROP TABLE IF EXISTS PUBLIC.CATEGORIES;
-CREATE TABLE IF NOT EXISTS PUBLIC.CATEGORIES (
-                                   CATEGORY_ID IDENTITY NOT NULL PRIMARY KEY,
-                                   NAME CHARACTER VARYING
---                                   CONSTRAINT CATEGORIES_PKEY PRIMARY KEY (CATEGORY_ID)
-);
---CREATE UNIQUE INDEX IF NOT EXISTS PRIMARY_KEY_6 ON PUBLIC.CATEGORIES (CATEGORY_ID);
-
---DROP TABLE IF EXISTS PUBLIC.FILM_CATEGORY;
-CREATE TABLE IF NOT EXISTS PUBLIC.FILM_CATEGORY (
-                                      FILM_ID INTEGER,
-                                      CATEGORY_ID INTEGER
-);
-
---DROP TABLE IF EXISTS PUBLIC.FILM_CATEGORY;
 CREATE TABLE IF NOT EXISTS PUBLIC.FILMS (
                               ID IDENTITY NOT NULL PRIMARY KEY,
                               NAME CHARACTER VARYING NOT NULL,
                               DESCRIPTION CHARACTER VARYING,
-                              FILMRELEASE DATE,
+                              RELEASE_DATE DATE,
                               DURATION INTEGER
---                              CONSTRAINT FILMS_PKEY PRIMARY KEY (ID)
 );
---CREATE UNIQUE INDEX IF NOT EXISTS PRIMARY_KEY_3F ON PUBLIC.FILMS (ID);
 
---DROP TABLE IF EXISTS PUBLIC.FRIENDS;
+CREATE TABLE IF NOT EXISTS PUBLIC.CATEGORIES (
+                                                 ID IDENTITY NOT NULL PRIMARY KEY,
+                                                 NAME CHARACTER VARYING
+);
+
+CREATE TABLE IF NOT EXISTS PUBLIC.FILM_CATEGORY (
+                                                    FILM_ID INTEGER REFERENCES PUBLIC.FILMS (ID),
+                                                    CATEGORY_ID INTEGER REFERENCES PUBLIC.CATEGORIES (ID)
+);
+
+
+CREATE TABLE IF NOT EXISTS PUBLIC.RATINGS (
+                                              ID IDENTITY NOT NULL PRIMARY KEY,
+                                              NAME CHARACTER VARYING
+);
+
+CREATE TABLE IF NOT EXISTS PUBLIC.FILM_RATING (
+                                                  FILM_ID INTEGER REFERENCES PUBLIC.FILMS (ID),
+                                                  RATING_ID INTEGER REFERENCES PUBLIC.RATINGS (ID)
+);
+
+CREATE TABLE IF NOT EXISTS PUBLIC.USERS (
+                                            ID IDENTITY NOT NULL PRIMARY KEY,
+                                            LOGIN CHARACTER VARYING NOT NULL,
+                                            NAME CHARACTER VARYING,
+                                            EMAIL CHARACTER VARYING NOT NULL,
+                                            BIRTHDAY DATE
+);
+
 CREATE TABLE IF NOT EXISTS PUBLIC.FRIENDS (
-                                RESPONDER_ID INTEGER,
-                                REQUESTER_ID INTEGER,
+                                RESPONDER_ID INTEGER REFERENCES PUBLIC.USERS (ID),
+                                REQUESTER_ID INTEGER REFERENCES PUBLIC.USERS (ID) ,
                                 IS_FRIENDS BOOLEAN
 );
 
---DROP TABLE IF EXISTS PUBLIC.LIKES;
 CREATE TABLE IF NOT EXISTS PUBLIC.LIKES (
-                              FILM_ID INTEGER,
-                              USER_ID INTEGER
+                              FILM_ID INTEGER REFERENCES PUBLIC.FILMS (ID),
+                              USER_ID INTEGER REFERENCES PUBLIC.USERS (ID)
 );
-
---DROP TABLE IF EXISTS PUBLIC.USERS;
-CREATE TABLE IF NOT EXISTS PUBLIC.USERS (
-                              ID IDENTITY NOT NULL PRIMARY KEY,
-                              EMAIL CHARACTER VARYING NOT NULL,
-                              LOGIN CHARACTER VARYING NOT NULL,
-                              NAME CHARACTER VARYING,
-                              BIRTHDAY DATE
---                              CONSTRAINT USERS_PKEY PRIMARY KEY (ID)
-);
---CREATE UNIQUE INDEX IF NOT EXISTS PRIMARY_KEY_4 ON PUBLIC.USERS (ID);

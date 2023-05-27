@@ -6,7 +6,7 @@ public enum Category {
     CARTOON(3,"Мультфильм"),
     THRILLER(4, "Триллер"),
     DOCUMENTARY(5,"Документальный"),
-    ACTION(5,"Боевик");
+    ACTION(6,"Боевик");
 
     private final int id;
     private final String name;
