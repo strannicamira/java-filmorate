@@ -23,8 +23,8 @@ public class UserDaoController {
     }
 
     @PostMapping(value = "/users")
-    public void create(@Valid @RequestBody User user) {
-        userDaoService.create(user);
+    public User create(@Valid @RequestBody User user) {
+        return userDaoService.create(user);
     }
 
     @PutMapping(value = "/users")
@@ -56,7 +56,7 @@ public class UserDaoController {
 
     @DeleteMapping(value = "/users/{id}/friends/{friendId}")
     public boolean deleteFriend(@PathVariable("id") Integer userId,
-                             @PathVariable("friendId") Integer friendId) {
+                                @PathVariable("friendId") Integer friendId) {
         return userDaoService.deleteFriend(userId, friendId);
     }
 }

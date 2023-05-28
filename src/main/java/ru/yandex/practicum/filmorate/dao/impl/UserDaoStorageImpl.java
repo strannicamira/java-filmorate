@@ -2,8 +2,10 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -30,7 +32,26 @@ public class UserDaoStorageImpl implements UserDao {
     }
 
     @Override
-    public void create(User user) {
+    public User create(User user) {
+        String userName = user.getName();
+        if (!StringUtils.hasText(userName)) {
+            userName = user.getLogin();
+        }
+
+        final User resultUser = User.builder()
+                .email(user.getEmail())
+                .name(userName)
+                .login(user.getLogin())
+                .birthday(user.getBirthday())
+                .friends(user.getFriends())
+                .build();
+        int id = insert(user);
+        resultUser.setId(id);
+        log.debug("Пользователь создан: '{}'", resultUser);
+        return resultUser;
+    }
+
+    private void save(User user) {
         String sqlQuery = "insert into users(login, name, email, birthday ) " +
                 "values (?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery,
@@ -38,6 +59,21 @@ public class UserDaoStorageImpl implements UserDao {
                 user.getName(),
                 user.getEmail(),
                 user.getBirthday());
+    }
+
+    private int insert(User user) {
+        SimpleJdbcInsert simpleJdbcInsert =
+                new SimpleJdbcInsert(jdbcTemplate)
+                        .withTableName("users")
+                        .usingGeneratedKeyColumns("id");
+
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("login", user.getLogin());
+        parameters.put("name", user.getName());
+        parameters.put("email", user.getEmail());
+        parameters.put("birthday",user.getBirthday());
+
+        return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
     @Override
