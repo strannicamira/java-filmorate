@@ -8,8 +8,6 @@ import java.util.Optional;
 public interface UserDao {
     List<User> findAll();
 
-    List<User> getAll();
-
     void create(User user);
 
     void update(User user);

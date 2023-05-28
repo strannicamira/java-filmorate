@@ -21,11 +21,6 @@ public class UserDaoServiceImpl implements UserDaoService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userDao.getAll();
-    }
-
-    @Override
     public void create(User user) {
         userDao.create(user);
     }
