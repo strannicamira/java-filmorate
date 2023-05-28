@@ -26,8 +26,8 @@ public class UserDaoServiceImpl implements UserDaoService {
     }
 
     @Override
-    public void update(User user) {
-        userDao.update(user);
+    public User update(User user) {
+        return userDao.update(user);
     }
 
     @Override
