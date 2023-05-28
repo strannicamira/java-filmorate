@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 public enum Category {
-    COMEDY (1,"Комедия"),
+    COMEDY(1,"Комедия"),
     DRAMA(2,"Драма"),
     CARTOON(3,"Мультфильм"),
     THRILLER(4, "Триллер"),
