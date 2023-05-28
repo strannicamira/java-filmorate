@@ -84,12 +84,12 @@ public class UserDaoStorageImpl implements UserDao {
         if (user == null) {
             throw new NotFoundException("Пользователь не будет обновлен. Никто.");
         }
-        put(user);
+        updateUser(user);
         log.info("Пользователь обновлен: '{}'", user);
         return user;
     }
 
-    private int put(User user) {
+    private int updateUser(User user) {
         String sqlQuery = "update users set login = ?, name = ?, email = ?, birthday = ? where id = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 user.getLogin(),

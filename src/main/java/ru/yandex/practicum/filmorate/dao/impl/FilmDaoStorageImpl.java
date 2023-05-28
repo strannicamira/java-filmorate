@@ -40,7 +40,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                 .genres(film.getGenres())
                 .build();
 
-        int id = insert(resultFilm);
+        int id = insertFilm(resultFilm);
         resultFilm.setId(id);
         if (resultFilm.getMpa() != null) {
             insertMpa(resultFilm);
@@ -55,7 +55,7 @@ public class FilmDaoStorageImpl implements FilmDao {
         return resultFilm;
     }
 
-    private int insert(Film film) {
+    private int insertFilm(Film film) {
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
                         .withTableName("films")
@@ -111,22 +111,55 @@ public class FilmDaoStorageImpl implements FilmDao {
         if (film == null) {
             throw new NotFoundException("Пользователь не будет обновлен. Никто.");
         }
-        put(film);
+        updateFilm(film);
         log.info("Пользователь обновлен: '{}'", film);
         return film;
     }
 
-    private int put(Film film) {
-        String sqlQuery = "update films set name = ?, description = ? , release_date = ?where id = ?";
+    private int updateFilm(Film film) {
+        String sqlQuery = "update films set name = ?, release_date = ?, description = ?, duration = ? where id = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 film.getName(),
-                film.getDescription(),
                 film.getReleaseDate(),
+                film.getDescription(),
+                film.getDuration(),
                 film.getId());
         if (count == 0) {
             throw new NotFoundException("Пользователь не сохранен: " + film.getName());
         }
+        if (film.getMpa() != null) {
+            updateMpa(film);
+        }
+        if (film.getGenres() != null) {
+            updateGenres(film);
+        }
         return count;
+    }
+
+    private int updateMpa(Film film) {
+        String sqlQuery = "update film_mpa set film_id = ?, mpa_id = ? where film_id = ?";
+        int count = jdbcTemplate.update(sqlQuery,
+                film.getId(),
+                film.getMpa().getId(),
+                film.getId());
+        if (count == 0) {
+            throw new NotFoundException("mpa не сохранен: " + film.getName());
+        }
+        return count;
+    }
+
+    private void updateGenres(Film film) {
+        String sqlQuery = "update film_genre set film_id = ?, genre_id = ? where film_id = ?";
+
+        for (Genres genre : film.getGenres()) {
+            int count = jdbcTemplate.update(sqlQuery,
+                    film.getId(),
+                    genre.getId(),
+                    film.getId());
+            if (count == 0) {
+                throw new NotFoundException("mpa не сохранен: " + film.getName());
+            }
+        }
     }
 
     @Override
