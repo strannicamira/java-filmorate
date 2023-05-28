@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;
@@ -181,12 +182,10 @@ public class FilmDaoStorageImpl implements FilmDao {
     @Override
     public Optional<Film> findFilmById(Integer id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(
-                "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration, C.NAME AS GENRE, R.NAME AS MPA\n" +
+                "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
                         "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
-                        "LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
-                        "    LEFT JOIN GENRES C on C.ID = FC.GENRE_ID\n" +
-                        "LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
-                        "LEFT JOIN MPA R on R.ID = FR.MPA_ID\n" +
+                        "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
+                        "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
                         "WHERE FILMS.ID = ?", id);
 
         if (filmRows.next()) {
@@ -196,8 +195,8 @@ public class FilmDaoStorageImpl implements FilmDao {
                     .description(filmRows.getString("description"))
                     .releaseDate(filmRows.getDate("release_date").toLocalDate())
                     .duration(filmRows.getInt("duration"))
-//                    .mpa(Mpa.valueOf("mpa"))
-//                    .genres((Set<Genres>)filmRows.getObject("genres"))
+                    .mpa(Mpa.forValues(filmRows.getInt("MPA")))
+                    .genres(Useful.getInt(filmRows,"GENRE").stream().map(genreId -> Genres.forValues(genreId)).collect(Collectors.toCollection(HashSet::new)))
                     .build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
