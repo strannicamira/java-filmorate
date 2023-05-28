@@ -14,10 +14,10 @@ public enum Genres {
     DOCUMENTARY(5, "Документальный"),
     ACTION(6, "Боевик");
 
-    private final int id;
+    private final Integer id;
     private final String name;
 
-    Genres(int id, String name) {
+    Genres(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
@@ -31,11 +31,11 @@ public enum Genres {
         return new JsonObject(id);
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
     @JsonCreator
-    public static Genres forValues(@JsonProperty("id") int id) {
+    public static Genres forValues(@JsonProperty("id") Integer id) {
         for (Genres genre : Genres.values()) {
             if (genre.id == id) {
                 return genre;

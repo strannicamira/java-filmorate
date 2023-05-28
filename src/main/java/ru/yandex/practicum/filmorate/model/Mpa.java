@@ -13,15 +13,15 @@ public enum Mpa {
     R(4, "R"),
     NC_17(5, "NC-17");
 
-    private final int id;
+    private final Integer id;
     private final String name;
 
-    Mpa(int id, String name) {
+    Mpa(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
     @JsonValue
@@ -33,7 +33,7 @@ public enum Mpa {
     }
 
     @JsonCreator
-    public static Mpa forValues(@JsonProperty("id") int id) {
+    public static Mpa forValues(@JsonProperty("id") Integer id) {
         for (Mpa mpa : Mpa.values()) {
             if (mpa.id == id) {
                 return mpa;

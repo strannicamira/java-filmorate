@@ -42,8 +42,14 @@ public class FilmDaoStorageImpl implements FilmDao {
 
         int id = insert(resultFilm);
         resultFilm.setId(id);
-        insertMpa(resultFilm);
-        insertGenres(resultFilm);
+        if (resultFilm.getMpa() != null) {
+            insertMpa(resultFilm);
+        }
+        if (resultFilm.getGenres() != null) {
+            insertGenres(resultFilm);
+        } else {
+            resultFilm.setGenres(new HashSet<>());
+        }
 
         log.info("Фильм создан: '{}'", resultFilm);
         return resultFilm;
@@ -87,7 +93,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                 new SimpleJdbcInsert(jdbcTemplate)
                         .withTableName("film_genre");
 
-        for (Genres genre : film.getGenres()){
+        for (Genres genre : film.getGenres()) {
             Map<String, Object> parameters = new HashMap<>();
 
             parameters.put("film_id", film.getId());
@@ -95,7 +101,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
             log.info("Будет сохранен genre: '{}'", parameters);
 
-             simpleJdbcInsert.execute(parameters);
+            simpleJdbcInsert.execute(parameters);
         }
 
     }
