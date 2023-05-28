@@ -34,6 +34,7 @@ public enum Genres {
     public Integer getId() {
         return id;
     }
+
     @JsonCreator
     public static Genres forValues(@JsonProperty("id") Integer id) {
         for (Genres genre : Genres.values()) {

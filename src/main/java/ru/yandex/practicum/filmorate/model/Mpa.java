@@ -24,10 +24,12 @@ public enum Mpa {
     public Integer getId() {
         return id;
     }
+
     @JsonValue
     public JsonObject getJsonId() {
         return new JsonObject(id);
     }
+
     public String getName() {
         return name;
     }
