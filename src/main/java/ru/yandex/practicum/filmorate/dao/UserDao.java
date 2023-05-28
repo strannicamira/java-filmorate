@@ -7,6 +7,9 @@ import java.util.Optional;
 
 public interface UserDao {
     List<User> findAll();
+
+    List<User> getAll();
+
     void create(User user);
 
     void update(User user);
@@ -17,4 +20,7 @@ public interface UserDao {
 
     List<User> getFriends(Integer userId);
 
+    List<User> getCommonFriends(Integer id, Integer otherId);
+
+    boolean deleteFriend(Integer userId, Integer friendId);
 }

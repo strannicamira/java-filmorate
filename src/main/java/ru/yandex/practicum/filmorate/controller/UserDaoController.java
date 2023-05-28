@@ -48,4 +48,15 @@ public class UserDaoController {
         return userDaoService.getFriends(userId);
     }
 
+    @GetMapping(value = "/users/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriend(@PathVariable("id") Integer id,
+                                      @PathVariable("otherId") Integer otherId) {
+        return userDaoService.getCommonFriends(id, otherId);
+    }
+
+    @DeleteMapping(value = "/users/{id}/friends/{friendId}")
+    public boolean deleteFriend(@PathVariable("id") Integer userId,
+                             @PathVariable("friendId") Integer friendId) {
+        return userDaoService.deleteFriend(userId, friendId);
+    }
 }

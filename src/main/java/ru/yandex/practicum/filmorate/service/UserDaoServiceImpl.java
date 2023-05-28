@@ -21,6 +21,11 @@ public class UserDaoServiceImpl implements UserDaoService {
     }
 
     @Override
+    public List<User> getAll() {
+        return userDao.getAll();
+    }
+
+    @Override
     public void create(User user) {
         userDao.create(user);
     }
@@ -43,5 +48,15 @@ public class UserDaoServiceImpl implements UserDaoService {
     @Override
     public List<User> getFriends(Integer userId) {
         return userDao.getFriends(userId);
+    }
+
+    @Override
+    public List<User> getCommonFriends(Integer id, Integer otherId) {
+        return userDao.getCommonFriends(id,otherId);
+    }
+
+    @Override
+    public boolean deleteFriend(Integer userId, Integer friendId) {
+        return userDao.deleteFriend(userId,friendId);
     }
 }

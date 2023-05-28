@@ -10,4 +10,7 @@ public interface UserDaoService extends UserDao {
 
     List<User> getFriends(Integer userId);
 
+    List<User> getCommonFriends(Integer id, Integer otherId);
+
+    boolean deleteFriend(Integer userId, Integer friendId);
 }
