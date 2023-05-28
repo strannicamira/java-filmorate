@@ -9,7 +9,7 @@ import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
 import javax.validation.Valid;
 import java.util.List;
 
-@RestController
+//@RestController
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
