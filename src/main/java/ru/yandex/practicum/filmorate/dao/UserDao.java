@@ -10,7 +10,7 @@ public interface UserDao {
 
     User create(User user);
 
-    void update(User user);
+    User update(User user);
 
     Optional<User> findUserById(Integer id);
 

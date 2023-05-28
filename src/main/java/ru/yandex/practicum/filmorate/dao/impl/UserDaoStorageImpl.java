@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 import ru.yandex.practicum.filmorate.dao.UserDao;
+import ru.yandex.practicum.filmorate.exception.InvalidIdException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -72,14 +73,23 @@ public class UserDaoStorageImpl implements UserDao {
         parameters.put("login", user.getLogin());
         parameters.put("name", user.getName());
         parameters.put("email", user.getEmail());
-        parameters.put("birthday",user.getBirthday());
+        parameters.put("birthday", user.getBirthday());
         log.info("Будет сохранен пользователь: '{}'", parameters);
 
         return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
     @Override
-    public void update(User user) {
+    public User update(User user) {
+        if (user == null) {
+            throw new NotFoundException("Пользователь не будет обновлен. Никто.");
+        }
+        put(user);
+        log.info("Пользователь обновлен: '{}'", user);
+        return user;
+    }
+
+    private int put(User user) {
         String sqlQuery = "update users set login = ?, name = ?, email = ?, birthday = ? where id = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 user.getLogin(),
@@ -88,8 +98,9 @@ public class UserDaoStorageImpl implements UserDao {
                 user.getBirthday(),
                 user.getId());
         if (count == 0) {
-            throw new NotFoundException("Пользователь не обновлен. Не может быть найден.");
+            throw new NotFoundException("Пользователь не сохранен: " + user.getLogin());
         }
+        return count;
     }
 
     @Override
@@ -122,6 +133,9 @@ public class UserDaoStorageImpl implements UserDao {
 
     @Override
     public void addFriend(Integer userId, Integer friendId) { //1[4]: userId=1, friendId=4, friends:responder_id=1=userId, requester_id=4=friendId
+        if (userId < 1 || friendId < 1) {
+            throw new InvalidIdException("Пользователь не обновлен. Не может быть найден.");
+        }
         String sqlQueryUpdate = "update friends set is_friends = ? where responder_id = ? and requester_id = ? ";
         int count = jdbcTemplate.update(sqlQueryUpdate, true, friendId, userId);
 

@@ -28,8 +28,8 @@ public class UserDaoController {
     }
 
     @PutMapping(value = "/users")
-    public void update(@Valid @RequestBody User user) {
-        userDaoService.update(user);
+    public User update(@Valid @RequestBody User user) {
+        return userDaoService.update(user);
     }
 
     @GetMapping("/users/{id}")
