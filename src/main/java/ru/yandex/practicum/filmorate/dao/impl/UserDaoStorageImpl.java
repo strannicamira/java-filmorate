@@ -38,16 +38,17 @@ public class UserDaoStorageImpl implements UserDao {
             userName = user.getLogin();
         }
 
-        final User resultUser = User.builder()
+        User resultUser = User.builder()
                 .email(user.getEmail())
                 .name(userName)
                 .login(user.getLogin())
                 .birthday(user.getBirthday())
                 .friends(user.getFriends())
                 .build();
-        int id = insert(user);
+        log.info("Будет создан пользователь: '{}'", resultUser);
+        int id = insert(resultUser);
         resultUser.setId(id);
-        log.debug("Пользователь создан: '{}'", resultUser);
+        log.info("Пользователь создан: '{}'", resultUser);
         return resultUser;
     }
 
@@ -72,6 +73,7 @@ public class UserDaoStorageImpl implements UserDao {
         parameters.put("name", user.getName());
         parameters.put("email", user.getEmail());
         parameters.put("birthday",user.getBirthday());
+        log.info("Будет сохранен пользователь: '{}'", parameters);
 
         return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
