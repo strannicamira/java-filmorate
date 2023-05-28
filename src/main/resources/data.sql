@@ -1,4 +1,4 @@
-INSERT INTO PUBLIC.CATEGORIES
+INSERT INTO PUBLIC.GENRES
     (NAME)
 VALUES ('Комедия'),
        ('Драма'),
@@ -7,7 +7,7 @@ VALUES ('Комедия'),
        ('Документальный'),
        ('Боевик');
 
-INSERT INTO PUBLIC.RATINGS
+INSERT INTO PUBLIC.MPA
     (NAME)
 VALUES ('G'),
        ('PG'),

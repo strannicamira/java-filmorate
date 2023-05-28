@@ -8,25 +8,25 @@ CREATE TABLE IF NOT EXISTS PUBLIC.FILMS (
                               DURATION INTEGER
 );
 
-CREATE TABLE IF NOT EXISTS PUBLIC.CATEGORIES (
+CREATE TABLE IF NOT EXISTS PUBLIC.GENRES (
                                                  ID IDENTITY NOT NULL PRIMARY KEY,
                                                  NAME CHARACTER VARYING
 );
 
-CREATE TABLE IF NOT EXISTS PUBLIC.FILM_CATEGORY (
+CREATE TABLE IF NOT EXISTS PUBLIC.FILM_GENRE (
                                                     FILM_ID INTEGER REFERENCES PUBLIC.FILMS (ID),
-                                                    CATEGORY_ID INTEGER REFERENCES PUBLIC.CATEGORIES (ID)
+                                                    GENRE_ID INTEGER REFERENCES PUBLIC.GENRES (ID)
 );
 
 
-CREATE TABLE IF NOT EXISTS PUBLIC.RATINGS (
+CREATE TABLE IF NOT EXISTS PUBLIC.MPA (
                                               ID IDENTITY NOT NULL PRIMARY KEY,
                                               NAME CHARACTER VARYING
 );
 
-CREATE TABLE IF NOT EXISTS PUBLIC.FILM_RATING (
+CREATE TABLE IF NOT EXISTS PUBLIC.FILM_MPA (
                                                   FILM_ID INTEGER REFERENCES PUBLIC.FILMS (ID),
-                                                  RATING_ID INTEGER REFERENCES PUBLIC.RATINGS (ID)
+                                                  MPA_ID INTEGER REFERENCES PUBLIC.MPA (ID)
 );
 
 CREATE TABLE IF NOT EXISTS PUBLIC.USERS (

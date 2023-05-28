@@ -28,7 +28,7 @@ public class UserDaoStorageImpl implements UserDao {
     @Override
     public List<User> findAll() {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select id from users ");
-        List<User> users = getInt(userRows, "id").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
+        List<User> users = Useful.getInt(userRows, "id").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -118,7 +118,7 @@ public class UserDaoStorageImpl implements UserDao {
                     .email(userRows.getString("email"))
                     .birthday(userRows.getDate("birthday").toLocalDate())
 //                    .friends((Set<Integer>) collect(userRows).stream().map(arg -> arg.getInt("FRIENDS")).collect(Collectors.toCollection(HashSet::new)))
-                    .friends(getInt(userRows, "FRIENDS"))
+                    .friends(Useful.getInt(userRows, "FRIENDS"))
                     .build();
 
             log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
@@ -150,7 +150,7 @@ public class UserDaoStorageImpl implements UserDao {
     @Override
     public List<User> getFriends(Integer userId) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? ", userId);
-        List<User> users = getInt(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
+        List<User> users = Useful.getInt(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -159,7 +159,7 @@ public class UserDaoStorageImpl implements UserDao {
         String sqlQuery = "select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? AND\n" +
                 "    FRIENDS.REQUESTER_ID IN (select FRIENDS.REQUESTER_ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ?)";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, id, otherId);
-        List<User> users = getInt(userRows, "ID").stream().map(i -> findUserById(i).get()).collect(Collectors.toList());
+        List<User> users = Useful.getInt(userRows, "ID").stream().map(i -> findUserById(i).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -180,46 +180,8 @@ public class UserDaoStorageImpl implements UserDao {
                 .name(resultSet.getString("name"))
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friends(getInt(resultSet, "FRIEND"))
+                .friends(Useful.getInt(resultSet, "FRIEND"))
                 .build();
-    }
-
-
-    private Set<Integer> getInt(SqlRowSet userRows, String label) {
-        Set<Integer> collection = new HashSet<>();
-        userRows.first();
-        do {
-            if (userRows.getRow() != 0) {
-                int i = userRows.getInt(label);
-                if (!userRows.wasNull()) {
-                    collection.add(i);
-                }
-            }
-        } while (userRows.next());
-        return collection;
-    }
-
-    private Set<Integer> getInt(ResultSet resultSet, String label) throws SQLException {
-        Set<Integer> collection = new HashSet<>();
-        log.info("Коллекция часть {}.", resultSet);
-
-        collection.add(resultSet.getInt(label));
-        log.info("Коллекция {}.", collection);
-
-        return collection;
-    }
-
-    Collection<SqlRowSet> getSqlRowSet(SqlRowSet userRows) {
-        Collection<SqlRowSet> collection = new HashSet<>();
-        userRows.first();
-        do {
-            log.info("Коллекция часть {}.", userRows);
-
-            collection.add(userRows);
-        } while (userRows.next());
-        log.info("Коллекция {}.", collection);
-
-        return collection;
     }
 
 }
