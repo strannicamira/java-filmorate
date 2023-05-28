@@ -127,7 +127,7 @@ public class UserDaoStorageImpl implements UserDao {
                 .name(resultSet.getString("name"))
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friends(convertInt(resultSet, "FRIENDS"))
+                .friends(convertInt(resultSet, "FRIEND"))
                 .build();
     }
 
@@ -147,11 +147,12 @@ public class UserDaoStorageImpl implements UserDao {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        String sqlQuery = "SELECT UF.ID, UF.LOGIN, UF.NAME, UF.EMAIL, UF.BIRTHDAY, F.REQUESTER_ID AS FRIENDS\n" +
-                "FROM FILMORATE.PUBLIC.USERS AS U\n" +
-                "LEFT JOIN  FILMORATE.PUBLIC.FRIENDS AS F ON U.ID = F.REQUESTER_ID\n" +
-                "LEFT JOIN FILMORATE.PUBLIC.USERS AS UF ON F.RESPONDER_ID = UF.ID\n" +
-                "WHERE U.ID=?";
+        String sqlQuery = "SELECT DISTINCT USERS.ID, USERS.LOGIN, USERS.NAME, USERS.EMAIL, USERS.BIRTHDAY, FRIENDS.RESPONDER_ID AS FRIEND\n" +
+                "FROM FILMORATE.PUBLIC.USERS AS USERS\n" +
+                "LEFT JOIN FILMORATE.PUBLIC.FRIENDS AS FRIENDS ON USERS.ID = FRIENDS.REQUESTER_ID\n" +
+                "LEFT JOIN FILMORATE.PUBLIC.USERS AS USERFRIENDS  on USERFRIENDS.ID = FRIENDS.RESPONDER_ID\n" +
+                "LEFT JOIN FILMORATE.PUBLIC.FRIENDS AS FRIENDRIENDS ON FRIENDRIENDS.REQUESTER_ID = FRIENDS.RESPONDER_ID\n" +
+                "WHERE USERS.ID=?";
 //        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, userId);
         return jdbcTemplate.query(sqlQuery, this::mapRowToUsers, userId);
 
