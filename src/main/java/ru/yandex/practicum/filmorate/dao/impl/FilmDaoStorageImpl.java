@@ -137,27 +137,43 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private int updateMpa(Film film) {
-        String sqlQuery = "update film_mpa set film_id = ?, mpa_id = ? where film_id = ?";
+        String sqlQuery = "update film_mpa set film_id = ?, mpa_id = ? where film_id = ? and mpa_id = ?";
+        Integer filmId = film.getId();
+        Integer mpaId = film.getMpa().getId();
         int count = jdbcTemplate.update(sqlQuery,
-                film.getId(),
-                film.getMpa().getId(),
-                film.getId());
+                filmId,
+                mpaId,
+                filmId,
+                mpaId);
         if (count == 0) {
-            throw new NotFoundException("mpa не сохранен: " + film.getName());
+
+            String sqlQueryInsert = "insert into film_genre(film_id, genre_id) values (?, ?)";
+            int countInsert = jdbcTemplate.update(sqlQueryInsert, filmId, mpaId);
+            if (countInsert == 0) {
+                throw new NotFoundException("mpa не удалось обновить: film_id/mpa_id" + filmId.toString() + "/" + mpaId);
+            }
         }
         return count;
     }
 
     private void updateGenres(Film film) {
-        String sqlQuery = "update film_genre set film_id = ?, genre_id = ? where film_id = ?";
+        String sqlQueryUpdate = "update film_genre set film_id = ?, genre_id = ? where film_id = ? and genre_id = ?";
 
         for (Genres genre : film.getGenres()) {
-            int count = jdbcTemplate.update(sqlQuery,
-                    film.getId(),
-                    genre.getId(),
-                    film.getId());
-            if (count == 0) {
-                throw new NotFoundException("mpa не сохранен: " + film.getName());
+            Integer filmId = film.getId();
+            Integer genreId = genre.getId();
+            int countUpdate = jdbcTemplate.update(sqlQueryUpdate,
+                    filmId,
+                    genreId,
+                    filmId,
+                    genreId);
+            if (countUpdate == 0) {
+                String sqlQueryInsert = "insert into film_genre(film_id, genre_id) values (?, ?)";
+                int countInsert = jdbcTemplate.update(sqlQueryInsert, filmId, genreId);
+                if (countInsert == 0) {
+                    throw new NotFoundException("genre не удалось обновить: film_id/genre_id " + film.getName() + "/" + genreId);
+
+                }
             }
         }
     }
