@@ -43,12 +43,12 @@ public class UserDaoStorageImpl implements UserDao {
     @Override
     public void update(User user) {
         String sqlQuery = "update users set login = ?, name = ?, email = ?, birthday = ? where id = ?";
-        int count = jdbcTemplate.update(sqlQuery
-                , user.getLogin()
-                , user.getName()
-                , user.getEmail()
-                , user.getBirthday()
-                , user.getId());
+        int count = jdbcTemplate.update(sqlQuery,
+                user.getLogin(),
+                user.getName(),
+                user.getEmail(),
+                user.getBirthday(),
+                user.getId());
         if (count == 0) {
             throw new NotFoundException("Пользователь не обновлен. Не может быть найден.");
         }
@@ -83,7 +83,7 @@ public class UserDaoStorageImpl implements UserDao {
     }
 
     @Override
-    public void addFriend(Integer userId, Integer friendId) {//1[4]: userId=1, friendId=4, friends:responder_id=1=userId, requester_id=4=friendId
+    public void addFriend(Integer userId, Integer friendId) { //1[4]: userId=1, friendId=4, friends:responder_id=1=userId, requester_id=4=friendId
         String sqlQueryUpdate = "update friends set is_friends = ? where responder_id = ? and requester_id = ? ";
         int count = jdbcTemplate.update(sqlQueryUpdate, true, friendId, userId);
 
@@ -112,7 +112,7 @@ public class UserDaoStorageImpl implements UserDao {
     }
 
     @Override
-    public boolean deleteFriend(Integer userId, Integer friendId) {//4 [1]
+    public boolean deleteFriend(Integer userId, Integer friendId) { //4 [1]
         String sqlQueryUpdate = "update friends set is_friends = ? " +
                 "where requester_id = ? and responder_id = ?";
         int count = jdbcTemplate.update(sqlQueryUpdate, false, userId, friendId);
