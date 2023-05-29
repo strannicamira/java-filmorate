@@ -124,7 +124,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private void updateFilm(Film film) {
-        String sqlQuery = "update films set name = ?, release_date = ?, description = ?, duration = ? where id = ?";
+        String sqlQuery = "UPDATE FILMS SET NAME = ?, RELEASE_DATE = ?, DESCRIPTION = ?, DURATION = ? WHERE ID = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 film.getName(),
                 film.getReleaseDate(),
@@ -143,7 +143,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private int rowInsertMpa(Film film) {
-        String sqlQueryInsert = "insert into film_genre(film_id, mpa_id) values (?, ?)";
+        String sqlQueryInsert = "INSERT INTO FILM_GENRE(FILM_ID, MPA_ID) VALUES (?, ?)";
         Integer filmId = film.getId();
         Integer mpaId = film.getMpa().getId();
         int count = jdbcTemplate.update(sqlQueryInsert, filmId, mpaId);
@@ -166,7 +166,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
 
     private int rowDeleteMpa(Film film) {
-        String sqlQueryDelete = "delete from film_mpa where film_id = ?";
+        String sqlQueryDelete = "DELETE FROM FILM_MPA WHERE FILM_ID = ?";
         int count = jdbcTemplate.update(sqlQueryDelete, film.getId());
         if (count == 0) {
             throw new NotFoundException("mpa не удалось удалить при обновить: film_id " + film.getId());
@@ -182,10 +182,9 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     private int deleteGenres(Film film) {
         int countDelete = 0;
-
         Set<Genres> genres = film.getGenres();
 //        if (genres != null && genres.size() != 0) {
-        String sqlQueryDelete = "delete from film_genre where film_id = ?";
+        String sqlQueryDelete = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
 //            if (countDelete == 0) {
 //                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
@@ -195,8 +194,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private void rowUpdateGenres(Film film) {
-        String sqlQueryUpdate = "update film_genre set film_id = ?, genre_id = ? where film_id = ? and genre_id = ?";
-
+        String sqlQueryUpdate = "UPDATE FILM_GENRE SET FILM_ID = ?, GENRE_ID = ? WHERE FILM_ID = ? AND GENRE_ID = ?";
         for (Genres genre : film.getGenres()) {
             Integer filmId = film.getId();
             Integer genreId = genre.getId();
@@ -206,7 +204,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                     filmId,
                     genreId);
             if (countUpdate == 0) {
-                String sqlQueryInsert = "insert into film_genre(film_id, genre_id) values (?, ?)";
+                String sqlQueryInsert = "INSERT INTO FILM_GENRE(FILM_ID, GENRE_ID) VALUES (?, ?)";
                 int countInsert = jdbcTemplate.update(sqlQueryInsert, filmId, genreId);
                 if (countInsert == 0) {
                     throw new NotFoundException("genre не удалось обновить: film_id/genre_id " + film.getName() + "/" + genreId);
@@ -219,22 +217,21 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     //    @Override
     public Optional<Film> findFilmByIdOld(Integer id) {
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(
-                "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
-                        "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
-                        "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
-                        "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
-                        "WHERE FILMS.ID = ? ", id);
-
+        String sql = "SELECT FILMS.ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.RELEASE_DATE, FILMS.DURATION,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
+                "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
+                "         LEFT JOIN FILM_GENRE FC ON FILMS.ID = FC.FILM_ID\n" +
+                "         LEFT JOIN FILM_MPA FR ON FILMS.ID = FR.FILM_ID\n" +
+                "WHERE FILMS.ID = ? ";
+        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
 
         if (filmRows.next()) {
             filmRows.first();
             Film film = Film.builder()
-                    .id(filmRows.getInt("id"))
-                    .name(filmRows.getString("name"))
-                    .description(filmRows.getString("description"))
-                    .releaseDate(filmRows.getDate("release_date").toLocalDate())
-                    .duration(filmRows.getInt("duration"))
+                    .id(filmRows.getInt("ID"))
+                    .name(filmRows.getString("NAME"))
+                    .description(filmRows.getString("DESCRIPTION"))
+                    .releaseDate(filmRows.getDate("RELEASE_DATE").toLocalDate())
+                    .duration(filmRows.getInt("DURATION"))
                     .mpa(Mpa.forValues(filmRows.getInt("MPA")))
                     .genres(UsefulDao.getIntSet(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
                     .likes(UsefulDao.getIntSet(filmRows, "LIKE_FROM_USER"))
@@ -252,15 +249,16 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public List<Film> findAll() {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select id from films ");
-        List<Film> films = UsefulDao.getIntSet(userRows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        String sql = "SELECT ID FROM FILMS";
+        SqlRowSet rows = jdbcTemplate.queryForRowSet(sql);
+        List<Film> films = UsefulDao.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
         return films;
     }
 
 
     @Override
     public Mpa findMpaById(Integer id) {
-        String sql = "select * from mpa where id = ?";
+        String sql = "SELECT * FROM MPA WHERE ID = ?";
         List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs), id);
         return mpa.get(0);
     }
@@ -268,7 +266,8 @@ public class FilmDaoStorageImpl implements FilmDao {
     @Override
     public Optional<Mpa> findMpaByIdOptionally(Integer id) {
 
-        SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
+        String sql = "SELECT * FROM MPA WHERE ID = ?";
+        SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
         if (rows.next()) {
             Mpa mpa = Mpa.forValues(rows.getInt("id"));
 
@@ -284,7 +283,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public List<Mpa> findAllMpa() {
-        String sql = "select distinct * from mpa";
+        String sql = "SELECT DISTINCT * FROM MPA";
         List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
         return mpa;
     }
@@ -292,14 +291,15 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public Genres findGenreById(Integer id) {
-        String sql = "select * from genres where id = ?";
+        String sql = "SELECT * FROM GENRES WHERE ID = ?";
         List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), id);
         return list.get(0);
     }
 
     @Override
     public Optional<Genres> findGenreByIdOptionally(Integer id) {
-        SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from genres where id = ?", id);
+        String sql = "SELECT * FROM GENRES WHERE ID = ?";
+        SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
         if (rows.next()) {
             Genres obj = Genres.forValues(rows.getInt("id"));
 
@@ -315,17 +315,17 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public List<Genres> findAllGenres() {
-        String sql = "select distinct * from genres";
+        String sql = "SELECT DISTINCT * FROM GENRES";
         List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
         return list;
     }
 
     private Mpa makeMpa(ResultSet rs) throws SQLException {
-        return Mpa.forValues(rs.getInt("id"));
+        return Mpa.forValues(rs.getInt("ID"));
     }
 
     private Genres makeGenre(ResultSet rs) throws SQLException {
-        return Genres.forValues(rs.getInt("id"));
+        return Genres.forValues(rs.getInt("ID"));
     }
 
     private static final String sort = ASCENDING_ORDER;
@@ -353,11 +353,11 @@ public class FilmDaoStorageImpl implements FilmDao {
 
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
-                        .withTableName("film_like");
+                        .withTableName("FILM_LIKE");
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put("film_id", filmId);
-        parameters.put("user_id", userId);
+        parameters.put("FILM_ID", filmId);
+        parameters.put("USER_ID", userId);
 
         log.info("Будет сохранен mpa: '{}'", parameters);
         simpleJdbcInsert.execute(parameters);
@@ -370,7 +370,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private int rowDeleteLike(Integer filmId, Integer userId) {
-        String sqlQueryDelete = "delete from film_like where film_id = ? and user_id =?";
+        String sqlQueryDelete = "DELETE FROM FILM_LIKE WHERE FILM_ID = ? AND USER_ID =?";
         int count = jdbcTemplate.update(sqlQueryDelete, filmId, userId);
         if (count == 0) {
             throw new NotFoundException("Не удалось лайкнуть: film_id/user_id " + filmId + "/" + userId);
@@ -380,24 +380,26 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public List<Film> findTopLiked(Integer count) {
-        SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT FILMS.ID AS ID\n" +
+        String sqlQuery = "SELECT FILMS.ID AS ID\n" +
                 "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
                 "         LEFT JOIN FILM_LIKE FL on FILMS.ID = FL.FILM_ID\n" +
                 "GROUP BY FILMS.ID\n" +
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
-                "LIMIT ?", count);
+                "LIMIT ?";
+        SqlRowSet rows = jdbcTemplate.queryForRowSet(sqlQuery, count);
         return UsefulDao.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
     }
 
 
     @Override
     public Optional<Film> findFilmById(Integer id) {
-        SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA, FL.USER_ID AS LIKE_FROM_USER\n" +
+        String sqlQuery = "SELECT FILMS.ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.RELEASE_DATE, FILMS.DURATION,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA, FL.USER_ID AS LIKE_FROM_USER\n" +
                 "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
-                "LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
-                "LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
-                "LEFT JOIN FILM_LIKE FL on FILMS.ID = FL.FILM_ID\n" +
-                "WHERE FILMS.id=?", id);
+                "LEFT JOIN FILM_GENRE FC ON FILMS.ID = FC.FILM_ID\n" +
+                "LEFT JOIN FILM_MPA FR ON FILMS.ID = FR.FILM_ID\n" +
+                "LEFT JOIN FILM_LIKE FL ON FILMS.ID = FL.FILM_ID\n" +
+                "WHERE FILMS.id=?";
+        SqlRowSet rows = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         if (rows.next()) {
             rows.first();
@@ -415,16 +417,14 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     private Film makeFilm(SqlRowSet rs) {
         return Film.builder()
-                .id(rs.getInt("id"))
-                .name(rs.getString("name"))
-                .description(rs.getString("description"))
-                .releaseDate(rs.getDate("release_date").toLocalDate())
-                .duration(rs.getInt("duration"))
+                .id(rs.getInt("ID"))
+                .name(rs.getString("NAME"))
+                .description(rs.getString("DESCRIPTION"))
+                .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
+                .duration(rs.getInt("DURATION"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
                 .genres(UsefulDao.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
                 .likes(UsefulDao.getIntSet(rs, "LIKE_FROM_USER"))
                 .build();
     }
-
-
 }
