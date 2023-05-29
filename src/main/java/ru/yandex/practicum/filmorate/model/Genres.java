@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Genres {
@@ -26,10 +25,10 @@ public enum Genres {
         return name;
     }
 
-    @JsonValue
-    public JsonObject getJsonId() {
-        return new JsonObject(id);
-    }
+//    @JsonValue
+//    public JsonObject getJsonId() {
+//        return new JsonObject(id);
+//    }
 
     public Integer getId() {
         return id;

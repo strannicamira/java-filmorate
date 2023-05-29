@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.model;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 @JsonFormat(shape = JsonFormat.Shape.OBJECT)
 public enum Mpa {
@@ -25,10 +24,10 @@ public enum Mpa {
         return id;
     }
 
-    @JsonValue
-    public JsonObject getJsonId() {
-        return new JsonObject(id);
-    }
+//    @JsonValue
+//    public JsonObject getJsonId() {
+//        return new JsonObject(id);
+//    }
 
     public String getName() {
         return name;
@@ -43,5 +42,6 @@ public enum Mpa {
         }
         return null;
     }
+
 
 }

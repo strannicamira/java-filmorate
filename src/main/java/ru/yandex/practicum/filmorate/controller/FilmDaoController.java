@@ -40,8 +40,6 @@ public class FilmDaoController {
     }
 
 
-
-
     @GetMapping("/mpa2/{id}")
     public Mpa findMpaById(@PathVariable("id") Integer id) {
         return filmDaoService.findMpaById(id);
