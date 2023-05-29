@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Slf4j
-public class UsefulDao {
+public class SqlRowResultParser {
     static Set<Integer> getIntSet(SqlRowSet userRows, String label) {
         Set<Integer> collection = new HashSet<>();
         userRows.first();

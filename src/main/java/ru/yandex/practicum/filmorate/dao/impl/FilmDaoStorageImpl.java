@@ -168,7 +168,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     public List<Film> findAll() {
         String sql = "SELECT ID FROM FILMS";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql);
-        List<Film> films = UsefulDao.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        List<Film> films = SqlRowResultParser.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
         return films;
     }
 
@@ -286,7 +286,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
                 "LIMIT ?";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sqlQuery, count);
-        return UsefulDao.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        return SqlRowResultParser.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
     }
 
 
@@ -321,8 +321,8 @@ public class FilmDaoStorageImpl implements FilmDao {
                 .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
                 .duration(rs.getInt("DURATION"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
-                .genres(UsefulDao.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
-                .likes(UsefulDao.getIntSet(rs, "LIKE_FROM_USER"))
+                .genres(SqlRowResultParser.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                .likes(SqlRowResultParser.getIntSet(rs, "LIKE_FROM_USER"))
                 .build();
     }
 }
