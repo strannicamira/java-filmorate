@@ -18,11 +18,6 @@ import java.util.Optional;
 public class FilmDaoController {
     private final FilmDaoService filmDaoService;
 
-    @GetMapping("/films")
-    public List<Film> findAll() {
-        return filmDaoService.findAll();
-    }
-
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) {
         return filmDaoService.create(film);
@@ -39,11 +34,23 @@ public class FilmDaoController {
     }
 
 
-    @GetMapping("/mpa/{id}")
+    @GetMapping("/films")
+    public List<Film> findAll() {
+        return filmDaoService.findAll();
+    }
+
+
+
+
+    @GetMapping("/mpa2/{id}")
     public Mpa findMpaById(@PathVariable("id") Integer id) {
         return filmDaoService.findMpaById(id);
     }
 
+    @GetMapping("/mpa/{id}")
+    public Optional<Mpa> findMpaByIdOptionally(@PathVariable("id") Integer id) {
+        return filmDaoService.findMpaByIdOptionally(id);
+    }
 
     @GetMapping("/mpa")
     public List<Mpa> findAllMpa() {
@@ -51,12 +58,12 @@ public class FilmDaoController {
     }
 
 
-    @GetMapping("/genre/{id}")
+    @GetMapping("/genre2/{id}")
     public Genres findGenreById(@PathVariable("id") Integer id) {
         return filmDaoService.findGenreById(id);
     }
 
-    @GetMapping("/genresop/{id}")
+    @GetMapping("/genres/{id}")
     public Optional<Genres> findGenreByIdOptionally(@PathVariable("id") Integer id) {
         return filmDaoService.findGenreByIdOptionally(id);
     }
