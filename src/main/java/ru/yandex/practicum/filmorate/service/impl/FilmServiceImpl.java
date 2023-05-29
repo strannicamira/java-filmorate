@@ -5,8 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genres;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
@@ -38,27 +36,6 @@ public class FilmServiceImpl implements FilmService {
         return filmDao.findFilmById(id);
     }
 
-
-    @Override
-    public Optional<Mpa> findMpaByIdOptionally(Integer id) {
-        return filmDao.findMpaByIdOptionally(id);
-    }
-
-    @Override
-    public List<Mpa> findAllMpa() {
-        return filmDao.findAllMpa();
-    }
-
-    @Override
-    public Optional<Genres> findGenreByIdOptionally(Integer id) {
-        return filmDao.findGenreByIdOptionally(id);
-    }
-
-    @Override
-    public List<Genres> findAllGenres() {
-        return filmDao.findAllGenres();
-    }
-
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         return filmDao.addLike(filmId, userId);
@@ -73,6 +50,5 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> findTopLiked(Integer count) {
         return filmDao.findTopLiked(count);
     }
-
 
 }

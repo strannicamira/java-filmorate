@@ -12,22 +12,25 @@ import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.ValidationException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import static ru.yandex.practicum.filmorate.Constants.ASCENDING_ORDER;
-import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @Component
 @Slf4j
 public class FilmDaoImpl implements FilmDao {
-    private final JdbcTemplate jdbcTemplate;
+    private static final String GENRES_ORDER = ASCENDING_ORDER;
 
-    public FilmDaoImpl(JdbcTemplate jdbcTemplate) {
+    private final JdbcTemplate jdbcTemplate;
+    private final MpaDaoImpl mpaDaoImpl;
+    private final GenreDaoImpl genreDaoImpl;
+
+    public FilmDaoImpl(JdbcTemplate jdbcTemplate, MpaDaoImpl mpaDaoImpl, GenreDaoImpl genreDaoImpl) {
         this.jdbcTemplate = jdbcTemplate;
+        this.mpaDaoImpl = mpaDaoImpl;
+        this.genreDaoImpl = genreDaoImpl;
     }
 
     @Override
@@ -48,8 +51,8 @@ public class FilmDaoImpl implements FilmDao {
 
         int id = insertFilm(resultFilm);
         resultFilm.setId(id);
-        insertMpa(resultFilm);
-        insertGenres(resultFilm);
+        mpaDaoImpl.insertMpa(resultFilm);
+        genreDaoImpl.insertGenres(resultFilm);
 
         log.info("Фильм создан: '{}'", resultFilm);
         return findFilmById(id).get();
@@ -72,43 +75,6 @@ public class FilmDaoImpl implements FilmDao {
         return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
-    private void insertMpa(Film film) {
-
-        SimpleJdbcInsert simpleJdbcInsert =
-                new SimpleJdbcInsert(jdbcTemplate)
-                        .withTableName("film_mpa");
-
-        Map<String, Object> parameters = new HashMap<>();
-        parameters.put("film_id", film.getId());
-        if (film.getMpa() != null) {
-            parameters.put("mpa_id", film.getMpa().getId());
-        } else {
-            parameters.put("mpa_id", null);
-        }
-
-        log.info("Будет сохранен mpa: '{}'", parameters);
-        simpleJdbcInsert.execute(parameters);
-    }
-
-    private void insertGenres(Film film) {
-        if (film.getGenres() == null) {
-            film.setGenres(new TreeSet<>());
-        }
-        SimpleJdbcInsert simpleJdbcInsert =
-                new SimpleJdbcInsert(jdbcTemplate)
-                        .withTableName("film_genre");
-        for (Genres genre : film.getGenres()) {
-            Map<String, Object> parameters = new HashMap<>();
-
-            parameters.put("film_id", film.getId());
-            parameters.put("genre_id", genre.getId());
-
-            log.info("Будет сохранен genre: '{}'", parameters);
-
-            simpleJdbcInsert.execute(parameters);
-        }
-    }
-
     @Override
     public Film update(Film film) {
         if (film == null) {
@@ -116,8 +82,8 @@ public class FilmDaoImpl implements FilmDao {
         }
 
         updateFilm(film);
-        updateFilmMpa(film);
-        updateGenres(film);
+        mpaDaoImpl.updateFilmMpa(film);
+        genreDaoImpl.updateGenres(film);
 
         log.info("Пользователь обновлен: '{}'", film);
         return findFilmById(film.getId()).get();
@@ -137,109 +103,12 @@ public class FilmDaoImpl implements FilmDao {
         }
     }
 
-    private void updateFilmMpa(Film film) {
-        rowDeleteMpa(film);
-        insertMpa(film);
-    }
-
-    private int rowDeleteMpa(Film film) {
-        String sqlQueryDelete = "DELETE FROM FILM_MPA WHERE FILM_ID = ?";
-        int count = jdbcTemplate.update(sqlQueryDelete, film.getId());
-        if (count == 0) {
-            throw new NotFoundException("mpa не удалось удалить при обновить: film_id " + film.getId());
-        }
-        return count;
-    }
-
-    private void updateGenres(Film film) {
-        deleteGenres(film);
-        insertGenres(film);
-    }
-
-    private int deleteGenres(Film film) {
-        int countDelete = 0;
-        Set<Genres> genres = film.getGenres();
-        String sqlQueryDelete = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
-        countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
-        return countDelete;
-    }
-
     @Override
     public List<Film> findAll() {
         String sql = "SELECT ID FROM FILMS";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql);
         List<Film> films = SqlRowResultParser.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
         return films;
-    }
-
-    @Override
-    public Optional<Mpa> findMpaByIdOptionally(Integer id) {
-
-        String sql = "SELECT * FROM MPA WHERE ID = ?";
-        SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
-        if (rows.next()) {
-            Mpa mpa = Mpa.forValues(rows.getInt("id"));
-
-            log.info("Найден mpa: {} {}", mpa.getId(), mpa.getName());
-
-            return Optional.of(mpa);
-        } else {
-            log.info("mpa с идентификатором {} не найден.", id);
-            throw new NotFoundException("mpa не найден.");
-        }
-    }
-
-    @Override
-    public List<Mpa> findAllMpa() {
-        String sql = "SELECT DISTINCT * FROM MPA";
-        List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
-        return mpa;
-    }
-
-    @Override
-    public Optional<Genres> findGenreByIdOptionally(Integer id) {
-        String sql = "SELECT * FROM GENRES WHERE ID = ?";
-        SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
-        if (rows.next()) {
-            Genres obj = Genres.forValues(rows.getInt("id"));
-
-            log.info("Найден Genre: {} {}", obj.getId(), obj.getName());
-
-            return Optional.of(obj);
-        } else {
-            log.info("Genre с идентификатором {} не найден.", id);
-            throw new NotFoundException("Genre не найден.");
-        }
-    }
-
-    @Override
-    public List<Genres> findAllGenres() {
-        String sql = "SELECT DISTINCT * FROM GENRES";
-        List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
-        return list;
-    }
-
-    private Mpa makeMpa(ResultSet rs) throws SQLException {
-        return Mpa.forValues(rs.getInt("ID"));
-    }
-
-    private Genres makeGenre(ResultSet rs) throws SQLException {
-        return Genres.forValues(rs.getInt("ID"));
-    }
-
-    private static final String sort = ASCENDING_ORDER;
-
-    private int compareGenres(Genres f0, Genres f1, String sort) {
-        int result = f0.getId() - (f1.getId());
-        switch (sort) {
-            case ASCENDING_ORDER:
-                result = 1 * result;
-                break;
-            case DESCENDING_ORDER:
-                result = -1 * result;
-                break;
-        }
-        return result;
     }
 
     @Override
@@ -321,7 +190,7 @@ public class FilmDaoImpl implements FilmDao {
                 .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
                 .duration(rs.getInt("DURATION"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
-                .genres(SqlRowResultParser.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                .genres(SqlRowResultParser.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> genreDaoImpl.compareGenres(p0, p1, GENRES_ORDER)).collect(Collectors.toCollection(TreeSet::new)))
                 .likes(SqlRowResultParser.getIntSet(rs, "LIKE_FROM_USER"))
                 .build();
     }

@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genres;
-import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
@@ -37,28 +35,6 @@ public class FilmController {
     @GetMapping("/films")
     public List<Film> findAll() {
         return filmService.findAll();
-    }
-
-
-    @GetMapping("/mpa/{id}")
-    public Optional<Mpa> findMpaByIdOptionally(@PathVariable("id") Integer id) {
-        return filmService.findMpaByIdOptionally(id);
-    }
-
-    @GetMapping("/mpa")
-    public List<Mpa> findAllMpa() {
-        return filmService.findAllMpa();
-    }
-
-
-    @GetMapping("/genres/{id}")
-    public Optional<Genres> findGenreByIdOptionally(@PathVariable("id") Integer id) {
-        return filmService.findGenreByIdOptionally(id);
-    }
-
-    @GetMapping("/genres")
-    public List<Genres> findAllGenres() {
-        return filmService.findAllGenres();
     }
 
 
