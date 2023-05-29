@@ -17,12 +17,13 @@ import java.util.*;
 
 @Component
 @Slf4j
-public class GenreDaoImpl  implements GenreDao {
+public class GenreDaoImpl implements GenreDao {
     private final JdbcTemplate jdbcTemplate;
 
     public GenreDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
+
     void insertGenres(Film film) {
         if (film.getGenres() == null) {
             film.setGenres(new TreeSet<Genres>());
@@ -31,7 +32,7 @@ public class GenreDaoImpl  implements GenreDao {
                 new SimpleJdbcInsert(jdbcTemplate)
                         .withTableName("film_genre");
         for (Genres genre : film.getGenres()) {
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
 
             parameters.put("film_id", film.getId());
             parameters.put("genre_id", genre.getId());
@@ -47,12 +48,9 @@ public class GenreDaoImpl  implements GenreDao {
         insertGenres(film);
     }
 
-    int deleteGenres(Film film) {
-        int countDelete = 0;
-        Set<Genres> genres = film.getGenres();
+    void deleteGenres(Film film) {
         String sqlQueryDelete = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
-        countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
-        return countDelete;
+        jdbcTemplate.update(sqlQueryDelete, film.getId());
     }
 
     @Override
@@ -60,11 +58,9 @@ public class GenreDaoImpl  implements GenreDao {
         String sql = "SELECT * FROM GENRES WHERE ID = ?";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
         if (rows.next()) {
-            Genres obj = Genres.forValues(rows.getInt("id"));
-
-            log.info("Найден Genre: {} {}", obj.getId(), obj.getName());
-
-            return Optional.of(obj);
+            Genres genre = Genres.forValues(rows.getInt("id"));
+            log.info("Найден Genre: {}", id);
+            return Optional.of(genre);
         } else {
             log.info("Genre с идентификатором {} не найден.", id);
             throw new NotFoundException("Genre не найден.");

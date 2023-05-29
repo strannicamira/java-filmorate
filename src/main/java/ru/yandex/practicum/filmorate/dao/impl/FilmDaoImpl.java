@@ -55,7 +55,7 @@ public class FilmDaoImpl implements FilmDao {
         genreDaoImpl.insertGenres(resultFilm);
 
         log.info("Фильм создан: '{}'", resultFilm);
-        return findFilmById(id).get();
+        return findFilmById(id).orElseGet(null);
     }
 
     private int insertFilm(Film film) {
@@ -64,7 +64,7 @@ public class FilmDaoImpl implements FilmDao {
                         .withTableName("films")
                         .usingGeneratedKeyColumns("id");
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("name", film.getName());
         parameters.put("description", film.getDescription());
         parameters.put("release_date", film.getReleaseDate());
@@ -86,7 +86,7 @@ public class FilmDaoImpl implements FilmDao {
         genreDaoImpl.updateGenres(film);
 
         log.info("Пользователь обновлен: '{}'", film);
-        return findFilmById(film.getId()).get();
+        return findFilmById(film.getId()).orElseGet(null);
     }
 
     private void updateFilm(Film film) {
@@ -107,14 +107,14 @@ public class FilmDaoImpl implements FilmDao {
     public List<Film> findAll() {
         String sql = "SELECT ID FROM FILMS";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql);
-        List<Film> films = SqlRowResultParser.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        List<Film> films = SqlRowResultParser.getIntSet(rows, "id").stream().map(id -> findFilmById(id).orElseGet(null)).collect(Collectors.toList());
         return films;
     }
 
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         insertLike(filmId, userId);
-        return findFilmById(filmId).get();
+        return findFilmById(filmId).orElseGet(null);
     }
 
     private void insertLike(Integer filmId, Integer userId) {
@@ -134,7 +134,7 @@ public class FilmDaoImpl implements FilmDao {
     @Override
     public Film deleteLike(Integer filmId, Integer userId) {
         rowDeleteLike(filmId, userId);
-        return findFilmById(filmId).get();
+        return findFilmById(filmId).orElseGet(null);
     }
 
     private int rowDeleteLike(Integer filmId, Integer userId) {
@@ -155,7 +155,7 @@ public class FilmDaoImpl implements FilmDao {
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
                 "LIMIT ?";
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sqlQuery, count);
-        return SqlRowResultParser.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        return SqlRowResultParser.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).orElseGet(null)).collect(Collectors.toList());
     }
 
 
@@ -187,7 +187,7 @@ public class FilmDaoImpl implements FilmDao {
                 .id(rs.getInt("ID"))
                 .name(rs.getString("NAME"))
                 .description(rs.getString("DESCRIPTION"))
-                .releaseDate(rs.getDate("RELEASE_DATE").toLocalDate())
+                .releaseDate(rs.getDate("RELEASE_DATE") == null ? null : rs.getDate("RELEASE_DATE").toLocalDate())
                 .duration(rs.getInt("DURATION"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
                 .genres(SqlRowResultParser.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> genreDaoImpl.compareGenres(p0, p1, GENRES_ORDER)).collect(Collectors.toCollection(TreeSet::new)))

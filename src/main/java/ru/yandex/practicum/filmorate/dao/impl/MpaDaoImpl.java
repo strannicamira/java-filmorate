@@ -32,7 +32,7 @@ public class MpaDaoImpl implements MpaDao {
                 new SimpleJdbcInsert(jdbcTemplate)
                         .withTableName("film_mpa");
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("film_id", film.getId());
         if (film.getMpa() != null) {
             parameters.put("mpa_id", film.getMpa().getId());
@@ -65,9 +65,7 @@ public class MpaDaoImpl implements MpaDao {
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql, id);
         if (rows.next()) {
             Mpa mpa = Mpa.forValues(rows.getInt("id"));
-
-            log.info("Найден mpa: {} {}", mpa.getId(), mpa.getName());
-
+            log.info("Найден mpa: {}", id);
             return Optional.of(mpa);
         } else {
             log.info("mpa с идентификатором {} не найден.", id);
