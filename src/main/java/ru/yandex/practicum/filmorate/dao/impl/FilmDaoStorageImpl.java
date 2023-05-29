@@ -12,6 +12,8 @@ import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import javax.validation.ValidationException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -179,7 +181,7 @@ public class FilmDaoStorageImpl implements FilmDao {
         int countDelete = 0;
 
         Set<Genres> genres = film.getGenres();
-        if (genres !=null && genres.size()!=0) {
+        if (genres != null && genres.size() != 0) {
             String sqlQueryDelete = "delete from film_genre where film_id = ?";
             countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
 //            if (countDelete == 0) {
@@ -250,4 +252,72 @@ public class FilmDaoStorageImpl implements FilmDao {
         return films;
     }
 
+
+    @Override
+    public Mpa findMpaById(Integer id) {
+        String sql = "select * from mpa where id = ?";
+        List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs), id);
+        return mpa.get(0);
+    }
+
+    @Override
+    public Optional<Mpa> findMpaByIdOptionally(Integer id) {
+        SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
+        if (rows.next()) {
+            Mpa mpa = Mpa.forValues(rows.getInt("id"));
+
+            log.info("Найден пользователь: {} {}", mpa.getId(), mpa.getName());
+
+            return Optional.of(mpa);
+        } else {
+            log.info("Пользователь с идентификатором {} не найден.", id);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Mpa> findAllMpa() {
+        String sql = "select distinct * from mpa";
+        List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
+        return mpa;
+    }
+
+
+    @Override
+    public Genres findGenreById(Integer id) {
+        String sql = "select * from genres where id = ?";
+        List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), id);
+        return list.get(0);
+    }
+
+    @Override
+    public Optional<Genres> findGenreByIdOptionally(Integer id) {
+        SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from genres where id = ?", id);
+        if (rows.next()) {
+            Genres obj = Genres.forValues(rows.getInt("id"));
+
+            log.info("Найден пользователь: {} {}", obj.getId(), obj.getName());
+
+            return Optional.of(obj);
+        } else {
+            log.info("Пользователь с идентификатором {} не найден.", id);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public List<Genres> findAllGenres() {
+        String sql = "select distinct * from genres";
+        List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs));
+        return list;
+    }
+
+
+    private Mpa makeMpa(ResultSet rs) throws SQLException {
+        return Mpa.forValues(rs.getInt("id"));
+    }
+
+    private Genres makeGenre(ResultSet rs) throws SQLException {
+        return Genres.forValues(rs.getInt("id"));
+    }
 }

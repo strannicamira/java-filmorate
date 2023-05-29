@@ -1,6 +1,8 @@
 package ru.yandex.practicum.filmorate.dao;
 
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,4 +15,16 @@ public interface FilmDao {
     Film update(Film film);
 
     Optional<Film> findFilmById(Integer id);
+
+    Mpa findMpaById(Integer id);
+
+    Optional<Mpa> findMpaByIdOptionally(Integer id);
+
+    List<Mpa> findAllMpa();
+
+    Genres findGenreById(Integer id);
+
+    Optional<Genres> findGenreByIdOptionally(Integer id);
+
+    List<Genres> findAllGenres();
 }

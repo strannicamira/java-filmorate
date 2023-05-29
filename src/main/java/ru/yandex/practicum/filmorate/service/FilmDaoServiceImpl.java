@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,4 +36,36 @@ public class FilmDaoServiceImpl implements FilmDaoService {
     public Optional<Film> findFilmById(Integer id) {
         return filmDao.findFilmById(id);
     }
+
+    @Override
+    public Mpa findMpaById(Integer id) {
+        return filmDao.findMpaById(id);
+    }
+
+    @Override
+    public Optional<Mpa> findMpaByIdOptionally(Integer id) {
+        return filmDao.findMpaByIdOptionally(id);
+    }
+
+    @Override
+    public List<Mpa> findAllMpa() {
+        return filmDao.findAllMpa();
+    }
+
+    @Override
+    public Genres findGenreById(Integer id) {
+        return filmDao.findGenreById(id);
+    }
+
+    @Override
+    public Optional<Genres> findGenreByIdOptionally(Integer id) {
+        return filmDao.findGenreByIdOptionally(id);
+    }
+
+    @Override
+    public List<Genres> findAllGenres() {
+        return filmDao.findAllGenres();
+    }
+
+
 }
