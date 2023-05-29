@@ -267,9 +267,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public Optional<Mpa> findMpaByIdOptionally(Integer id) {
-        if (Mpa.forValues(id) == null) {
 
-        }
         SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
         if (rows.next()) {
             Mpa mpa = Mpa.forValues(rows.getInt("id"));
