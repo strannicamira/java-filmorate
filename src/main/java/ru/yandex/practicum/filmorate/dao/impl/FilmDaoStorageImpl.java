@@ -185,8 +185,8 @@ public class FilmDaoStorageImpl implements FilmDao {
 
         Set<Genres> genres = film.getGenres();
 //        if (genres != null && genres.size() != 0) {
-            String sqlQueryDelete = "delete from film_genre where film_id = ?";
-            countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
+        String sqlQueryDelete = "delete from film_genre where film_id = ?";
+        countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
 //            if (countDelete == 0) {
 //                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
 //            }
@@ -217,7 +217,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
 
-//    @Override
+    //    @Override
     public Optional<Film> findFilmByIdOld(Integer id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(
                 "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
@@ -267,7 +267,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public Optional<Mpa> findMpaByIdOptionally(Integer id) {
-        if(Mpa.forValues(id)==null){
+        if (Mpa.forValues(id) == null) {
 
         }
         SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
