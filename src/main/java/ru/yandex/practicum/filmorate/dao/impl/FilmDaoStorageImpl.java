@@ -43,17 +43,11 @@ public class FilmDaoStorageImpl implements FilmDao {
 
         int id = insertFilm(resultFilm);
         resultFilm.setId(id);
-        if (resultFilm.getMpa() != null) {
-            insertMpa(resultFilm);
-        }
-        if (resultFilm.getGenres() != null) {
-            insertGenres(resultFilm);
-        } else {
-            resultFilm.setGenres(new HashSet<>());
-        }
+        insertMpa(resultFilm);
+        insertGenres(resultFilm);
 
         log.info("Фильм создан: '{}'", resultFilm);
-        return resultFilm;
+        return findFilmById(film.getId()).get();
     }
 
     private int insertFilm(Film film) {
@@ -73,7 +67,7 @@ public class FilmDaoStorageImpl implements FilmDao {
         return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
-    private int insertMpa(Film film) {
+    private void insertMpa(Film film) {
 
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
@@ -81,19 +75,23 @@ public class FilmDaoStorageImpl implements FilmDao {
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("film_id", film.getId());
-        parameters.put("mpa_id", film.getMpa().getId());
+        if (film.getMpa() != null) {
+            parameters.put("mpa_id", film.getMpa().getId());
+        } else {
+            parameters.put("mpa_id", null);
+        }
 
         log.info("Будет сохранен mpa: '{}'", parameters);
-
-        return simpleJdbcInsert.execute(parameters);
+        simpleJdbcInsert.execute(parameters);
     }
 
     private void insertGenres(Film film) {
-
+        if (film.getGenres() == null) {
+            film.setGenres(new HashSet<>());
+        }
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
                         .withTableName("film_genre");
-
         for (Genres genre : film.getGenres()) {
             Map<String, Object> parameters = new HashMap<>();
 
@@ -104,7 +102,6 @@ public class FilmDaoStorageImpl implements FilmDao {
 
             simpleJdbcInsert.execute(parameters);
         }
-
     }
 
     @Override
@@ -112,12 +109,16 @@ public class FilmDaoStorageImpl implements FilmDao {
         if (film == null) {
             throw new NotFoundException("Пользователь не будет обновлен. Никто.");
         }
+
         updateFilm(film);
+        updateFilmMpa(film);
+        updateGenres(film);
+
         log.info("Пользователь обновлен: '{}'", film);
-        return film;
+        return findFilmById(film.getId()).get();
     }
 
-    private int updateFilm(Film film) {
+    private void updateFilm(Film film) {
         String sqlQuery = "update films set name = ?, release_date = ?, description = ?, duration = ? where id = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 film.getName(),
@@ -125,39 +126,66 @@ public class FilmDaoStorageImpl implements FilmDao {
                 film.getDescription(),
                 film.getDuration(),
                 film.getId());
+
         if (count == 0) {
             throw new NotFoundException("Пользователь не сохранен: " + film.getName());
         }
-        if (film.getMpa() != null) {
-            updateMpa(film);
-        }
-        if (film.getGenres() != null) {
-            updateGenres(film);
+    }
+
+    private void updateFilmMpa(Film film) {
+        rowDeleteMpa(film);
+        insertMpa(film);
+    }
+
+    private int rowInsertMpa(Film film) {
+        String sqlQueryInsert = "insert into film_genre(film_id, mpa_id) values (?, ?)";
+        Integer filmId = film.getId();
+        Integer mpaId = film.getMpa().getId();
+        int count = jdbcTemplate.update(sqlQueryInsert, filmId, mpaId);
+        if (count == 0) {
+            throw new NotFoundException("mpa не удалось обновить: film_id/mpa_id" + filmId.toString() + "/" + mpaId);
         }
         return count;
     }
 
-    private int updateMpa(Film film) {
+/*
+    private int rowUpdateMpa(Film film) {
+        int count;
         String sqlQuery = "update film_mpa set film_id = ?, mpa_id = ? where film_id = ? and mpa_id = ?";
         Integer filmId = film.getId();
         Integer mpaId = film.getMpa().getId();
-        int count = jdbcTemplate.update(sqlQuery,
-                filmId,
-                mpaId,
-                filmId,
-                mpaId);
-        if (count == 0) {
+        count = jdbcTemplate.update(sqlQuery, filmId, mpaId, filmId, mpaId);
+        return count;
+    }
+*/
 
-            String sqlQueryInsert = "insert into film_genre(film_id, genre_id) values (?, ?)";
-            int countInsert = jdbcTemplate.update(sqlQueryInsert, filmId, mpaId);
-            if (countInsert == 0) {
-                throw new NotFoundException("mpa не удалось обновить: film_id/mpa_id" + filmId.toString() + "/" + mpaId);
-            }
+
+    private int rowDeleteMpa(Film film) {
+        String sqlQueryDelete = "delete from film_mpa where film_id = ?";
+        int count = jdbcTemplate.update(sqlQueryDelete, film.getId());
+        if (count == 0) {
+            throw new NotFoundException("mpa не удалось удалить при обновить: film_id " + film.getId());
         }
         return count;
     }
 
+
     private void updateGenres(Film film) {
+        deleteGenres(film);
+        insertGenres(film);
+    }
+
+    private int deleteGenres(Film film) {
+        int countDelete;
+        String sqlQueryDelete = "delete from film_genre where film_id = ?";
+        countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
+        if (countDelete == 0) {
+            throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
+        }
+        return countDelete;
+    }
+
+    private void rowUpdateGenres(Film film) {
         String sqlQueryUpdate = "update film_genre set film_id = ?, genre_id = ? where film_id = ? and genre_id = ?";
 
         for (Genres genre : film.getGenres()) {
@@ -179,6 +207,7 @@ public class FilmDaoStorageImpl implements FilmDao {
         }
     }
 
+
     @Override
     public Optional<Film> findFilmById(Integer id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(
@@ -196,7 +225,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                     .releaseDate(filmRows.getDate("release_date").toLocalDate())
                     .duration(filmRows.getInt("duration"))
                     .mpa(Mpa.forValues(filmRows.getInt("MPA")))
-                    .genres(Useful.getInt(filmRows,"GENRE").stream().map(genreId -> Genres.forValues(genreId)).collect(Collectors.toCollection(HashSet::new)))
+                    .genres(Useful.getInt(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).collect(Collectors.toCollection(HashSet::new)))
                     .build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
