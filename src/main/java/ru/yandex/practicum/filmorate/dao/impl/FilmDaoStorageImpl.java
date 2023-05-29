@@ -217,15 +217,14 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
 
-    @Override
-    public Optional<Film> findFilmById(Integer id) {
+//    @Override
+    public Optional<Film> findFilmByIdOld(Integer id) {
         SqlRowSet filmRows = jdbcTemplate.queryForRowSet(
                 "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
                         "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
                         "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
                         "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
-                        "WHERE FILMS.ID = ? " +
-                        "ORDER BY GENRE", id);
+                        "WHERE FILMS.ID = ? ", id);
 
 
         if (filmRows.next()) {
@@ -238,6 +237,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                     .duration(filmRows.getInt("duration"))
                     .mpa(Mpa.forValues(filmRows.getInt("MPA")))
                     .genres(Useful.getInt(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                    .likes(Useful.getInt(filmRows, "LIKE_FROM_USER"))
                     .build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
@@ -334,14 +334,12 @@ public class FilmDaoStorageImpl implements FilmDao {
                 result = 1 * result;
                 break;
             case DESCENDING_ORDER:
-                result = -1 * result; //обратный порядок сортировки
+                result = -1 * result;
                 break;
         }
         return result;
     }
 
-
-    /////////////////////////////////////////
     @Override
     public Film addLike(Integer filmId, Integer userId) {
         insertLike(filmId, userId);
@@ -377,7 +375,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         return count;
     }
 
-
     @Override
     public List<Film> findTopLiked(Integer count) {
         SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT FILMS.ID AS ID\n" +
@@ -386,13 +383,34 @@ public class FilmDaoStorageImpl implements FilmDao {
                 "GROUP BY FILMS.ID\n" +
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
                 "LIMIT ?", count);
-        return Useful.getInt(rows, "ID").stream().map(id->findFilmById(id).get()).collect(Collectors.toList());
-
-
-//        return filter(count, sort);
+        return Useful.getInt(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
     }
 
-    private Film makeFilm(ResultSet rs) throws SQLException {
+
+    @Override
+    public Optional<Film> findFilmById(Integer id) {
+        SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA, FL.USER_ID AS LIKE_FROM_USER\n" +
+                "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
+                "LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
+                "LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
+                "LEFT JOIN FILM_LIKE FL on FILMS.ID = FL.FILM_ID\n" +
+                "WHERE FILMS.id=?", id);
+
+        if (rows.next()) {
+            rows.first();
+            Film film = makeFilm(rows);
+
+            log.info("Найден фильм: {} {}", film.getId(), film.getName());
+
+            return Optional.of(film);
+        } else {
+            log.info("Фильм с идентификатором {} не найден.", id);
+            throw new NotFoundException("Фильм не обновлен. Не может быть найден.");
+//            return Optional.empty();
+        }
+    }
+
+    private Film makeFilm(SqlRowSet rs) {
         return Film.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
@@ -405,26 +423,5 @@ public class FilmDaoStorageImpl implements FilmDao {
                 .build();
     }
 
-/*    public List<Film> filter(Integer count, String sort) {
-        return films
-                .values()
-                .stream()
-                .sorted((p0, p1) -> compare(p0, p1, sort))
-                .limit(count)
-                .collect(Collectors.toList());
-    }*/
 
-    private int compareFilms(Film f0, Film f1, String sort) {
-        int result = f0.getLikes().size() - (f1.getLikes().size());
-        switch (sort) {
-            case ASCENDING_ORDER:
-                result = 1 * result;
-                break;
-            case DESCENDING_ORDER:
-                result = -1 * result; //обратный порядок сортировки
-                break;
-        }
-        return result;
-    }
-////////////////////////////////////////////////////////////////
 }
