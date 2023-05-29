@@ -47,7 +47,7 @@ public class FilmDaoStorageImpl implements FilmDao {
         insertGenres(resultFilm);
 
         log.info("Фильм создан: '{}'", resultFilm);
-        return findFilmById(film.getId()).get();
+        return findFilmById(id).get();
     }
 
     private int insertFilm(Film film) {
@@ -176,11 +176,13 @@ public class FilmDaoStorageImpl implements FilmDao {
     }
 
     private int deleteGenres(Film film) {
-        int countDelete;
-        String sqlQueryDelete = "delete from film_genre where film_id = ?";
-        countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
-        if (countDelete == 0) {
-            throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
+        int countDelete = 0;
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            String sqlQueryDelete = "delete from film_genre where film_id = ?";
+            countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
+            if (countDelete == 0) {
+                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
+            }
         }
         return countDelete;
     }
@@ -218,6 +220,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                         "WHERE FILMS.ID = ?", id);
 
         if (filmRows.next()) {
+            filmRows.first();
             Film film = Film.builder()
                     .id(filmRows.getInt("id"))
                     .name(filmRows.getString("name"))
