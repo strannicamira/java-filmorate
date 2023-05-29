@@ -177,12 +177,14 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     private int deleteGenres(Film film) {
         int countDelete = 0;
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+
+        Set<Genres> genres = film.getGenres();
+        if (genres !=null && genres.size()!=0) {
             String sqlQueryDelete = "delete from film_genre where film_id = ?";
             countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
-            if (countDelete == 0) {
-                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
-            }
+//            if (countDelete == 0) {
+//                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
+//            }
         }
         return countDelete;
     }
