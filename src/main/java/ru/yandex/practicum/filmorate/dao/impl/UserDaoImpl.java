@@ -18,10 +18,10 @@ import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
-public class UserDaoStorageImpl implements UserDao {
+public class UserDaoImpl implements UserDao {
     private final JdbcTemplate jdbcTemplate;
 
-    public UserDaoStorageImpl(JdbcTemplate jdbcTemplate) {
+    public UserDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

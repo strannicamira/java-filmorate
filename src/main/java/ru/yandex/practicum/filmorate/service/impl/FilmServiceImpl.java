@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.dao.FilmDao;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genres;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.service.FilmDaoService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class FilmDaoServiceImpl implements FilmDaoService {
+public class FilmServiceImpl implements FilmService {
     private final FilmDao filmDao;
 
     @Override

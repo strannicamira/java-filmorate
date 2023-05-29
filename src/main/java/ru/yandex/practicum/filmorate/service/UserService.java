@@ -5,7 +5,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
-public interface UserDaoService extends UserDao {
+public interface UserService extends UserDao {
     void addFriend(Integer userId, Integer friendId);
 
     List<User> getFriends(Integer userId);

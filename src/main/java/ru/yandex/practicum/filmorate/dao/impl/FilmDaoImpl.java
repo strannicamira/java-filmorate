@@ -23,10 +23,10 @@ import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
 
 @Component
 @Slf4j
-public class FilmDaoStorageImpl implements FilmDao {
+public class FilmDaoImpl implements FilmDao {
     private final JdbcTemplate jdbcTemplate;
 
-    public FilmDaoStorageImpl(JdbcTemplate jdbcTemplate) {
+    public FilmDaoImpl(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
