@@ -10,9 +10,7 @@ CREATE TABLE IF NOT EXISTS PUBLIC.FILMS (
 
 CREATE TABLE IF NOT EXISTS PUBLIC.GENRES (
                                                  ID IDENTITY NOT NULL PRIMARY KEY,
-                                                 NAME CHARACTER VARYING,
-                                                 CONSTRAINT GENRES_NAME_UNIC UNIQUE (NAME)
-
+                                                 NAME CHARACTER VARYING
 );
 
 CREATE TABLE IF NOT EXISTS PUBLIC.FILM_GENRE (
@@ -23,8 +21,7 @@ CREATE TABLE IF NOT EXISTS PUBLIC.FILM_GENRE (
 
 CREATE TABLE IF NOT EXISTS PUBLIC.MPA (
                                               ID IDENTITY NOT NULL PRIMARY KEY,
-                                              NAME CHARACTER VARYING,
-                                              CONSTRAINT MPA_NAME_UNIC UNIQUE (NAME)
+                                              NAME CHARACTER VARYING
 );
 
 CREATE TABLE IF NOT EXISTS PUBLIC.FILM_MPA (
