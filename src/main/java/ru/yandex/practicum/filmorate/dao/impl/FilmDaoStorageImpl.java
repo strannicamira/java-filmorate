@@ -267,16 +267,20 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public Optional<Mpa> findMpaByIdOptionally(Integer id) {
+        if(Mpa.forValues(id)==null){
+
+        }
         SqlRowSet rows = jdbcTemplate.queryForRowSet("select * from mpa where id = ?", id);
         if (rows.next()) {
             Mpa mpa = Mpa.forValues(rows.getInt("id"));
 
-            log.info("Найден пользователь: {} {}", mpa.getId(), mpa.getName());
+            log.info("Найден mpa: {} {}", mpa.getId(), mpa.getName());
 
             return Optional.of(mpa);
         } else {
-            log.info("Пользователь с идентификатором {} не найден.", id);
-            return Optional.empty();
+            log.info("mpa с идентификатором {} не найден.", id);
+            throw new NotFoundException("mpa не найден.");
+//            return Optional.empty();
         }
     }
 
@@ -301,12 +305,13 @@ public class FilmDaoStorageImpl implements FilmDao {
         if (rows.next()) {
             Genres obj = Genres.forValues(rows.getInt("id"));
 
-            log.info("Найден пользователь: {} {}", obj.getId(), obj.getName());
+            log.info("Найден Genre: {} {}", obj.getId(), obj.getName());
 
             return Optional.of(obj);
         } else {
-            log.info("Пользователь с идентификатором {} не найден.", id);
-            return Optional.empty();
+            log.info("Genre с идентификатором {} не найден.", id);
+            throw new NotFoundException("Genre не найден.");
+//            return Optional.empty();
         }
     }
 
