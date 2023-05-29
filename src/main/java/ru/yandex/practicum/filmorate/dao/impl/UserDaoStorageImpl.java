@@ -28,7 +28,7 @@ public class UserDaoStorageImpl implements UserDao {
     @Override
     public List<User> findAll() {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select id from users ");
-        List<User> users = Useful.getInt(userRows, "id").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
+        List<User> users = UsefulDao.getIntSet(userRows, "id").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -118,7 +118,7 @@ public class UserDaoStorageImpl implements UserDao {
                     .email(userRows.getString("email"))
                     .birthday(userRows.getDate("birthday").toLocalDate())
 //                    .friends((Set<Integer>) collect(userRows).stream().map(arg -> arg.getInt("FRIENDS")).collect(Collectors.toCollection(HashSet::new)))
-                    .friends(Useful.getInt(userRows, "FRIENDS"))
+                    .friends(UsefulDao.getIntSet(userRows, "FRIENDS"))
                     .build();
 
             log.info("Найден пользователь: {} {}", user.getId(), user.getLogin());
@@ -150,7 +150,7 @@ public class UserDaoStorageImpl implements UserDao {
     @Override
     public List<User> getFriends(Integer userId) {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? ", userId);
-        List<User> users = Useful.getInt(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
+        List<User> users = UsefulDao.getIntSet(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -159,7 +159,7 @@ public class UserDaoStorageImpl implements UserDao {
         String sqlQuery = "select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? AND\n" +
                 "    FRIENDS.REQUESTER_ID IN (select FRIENDS.REQUESTER_ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ?)";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, id, otherId);
-        List<User> users = Useful.getInt(userRows, "ID").stream().map(i -> findUserById(i).get()).collect(Collectors.toList());
+        List<User> users = UsefulDao.getIntSet(userRows, "ID").stream().map(i -> findUserById(i).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -180,7 +180,7 @@ public class UserDaoStorageImpl implements UserDao {
                 .name(resultSet.getString("name"))
                 .email(resultSet.getString("email"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friends(Useful.getInt(resultSet, "FRIEND"))
+                .friends(UsefulDao.getIntSet(resultSet, "FRIEND"))
                 .build();
     }
 

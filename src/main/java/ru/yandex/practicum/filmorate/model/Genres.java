@@ -25,11 +25,6 @@ public enum Genres {
         return name;
     }
 
-//    @JsonValue
-//    public JsonObject getJsonId() {
-//        return new JsonObject(id);
-//    }
-
     public Integer getId() {
         return id;
     }

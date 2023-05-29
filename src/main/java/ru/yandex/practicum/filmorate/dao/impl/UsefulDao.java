@@ -2,15 +2,16 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import ru.yandex.practicum.filmorate.model.Genres;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @Slf4j
-public class Useful {
-    static Set<Integer> getInt(SqlRowSet userRows, String label) {
+public class UsefulDao {
+    static Set<Integer> getIntSet(SqlRowSet userRows, String label) {
         Set<Integer> collection = new HashSet<>();
         userRows.first();
         do {
@@ -24,22 +25,7 @@ public class Useful {
         return collection;
     }
 
-    static Set<Genres> getGenres(SqlRowSet userRows, String label) {
-        Set<Genres> collection = new HashSet<>();
-        userRows.first();
-        do {
-            if (userRows.getRow() != 0) {
-                Genres genre = userRows.getObject(label, Genres.class);
-                if (!userRows.wasNull()) {
-                    collection.add(genre);
-                }
-            }
-        } while (userRows.next());
-        return collection;
-    }
-
-
-    static Set<Integer> getInt(ResultSet resultSet, String label) throws SQLException {
+    static Set<Integer> getIntSet(ResultSet resultSet, String label) throws SQLException {
         Set<Integer> collection = new HashSet<>();
         log.info("Коллекция часть {}.", resultSet);
 

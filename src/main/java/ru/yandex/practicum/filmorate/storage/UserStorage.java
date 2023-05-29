@@ -20,4 +20,4 @@ public interface UserStorage {
 
     List<User> getCommonFriends(Integer userId, Integer otherId);
 
-    }
+}

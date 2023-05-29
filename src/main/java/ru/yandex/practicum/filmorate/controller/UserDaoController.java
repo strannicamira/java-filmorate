@@ -19,7 +19,7 @@ public class UserDaoController {
 
     @GetMapping("/users")
     public List<User> findAll() {
-        return (List<User>) userDaoService.findAll();
+        return userDaoService.findAll();
     }
 
     @PostMapping(value = "/users")

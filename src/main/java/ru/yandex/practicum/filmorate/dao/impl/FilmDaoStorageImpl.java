@@ -236,8 +236,8 @@ public class FilmDaoStorageImpl implements FilmDao {
                     .releaseDate(filmRows.getDate("release_date").toLocalDate())
                     .duration(filmRows.getInt("duration"))
                     .mpa(Mpa.forValues(filmRows.getInt("MPA")))
-                    .genres(Useful.getInt(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
-                    .likes(Useful.getInt(filmRows, "LIKE_FROM_USER"))
+                    .genres(UsefulDao.getIntSet(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                    .likes(UsefulDao.getIntSet(filmRows, "LIKE_FROM_USER"))
                     .build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
@@ -253,7 +253,7 @@ public class FilmDaoStorageImpl implements FilmDao {
     @Override
     public List<Film> findAll() {
         SqlRowSet userRows = jdbcTemplate.queryForRowSet("select id from films ");
-        List<Film> films = Useful.getInt(userRows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        List<Film> films = UsefulDao.getIntSet(userRows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
         return films;
     }
 
@@ -386,7 +386,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                 "GROUP BY FILMS.ID\n" +
                 "ORDER BY COUNT(FL.USER_ID) DESC\n" +
                 "LIMIT ?", count);
-        return Useful.getInt(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
+        return UsefulDao.getIntSet(rows, "ID").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
     }
 
 
@@ -421,8 +421,8 @@ public class FilmDaoStorageImpl implements FilmDao {
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
-                .genres(Useful.getInt(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
-                .likes(Useful.getInt(rs, "LIKE_FROM_USER"))
+                .genres(UsefulDao.getIntSet(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                .likes(UsefulDao.getIntSet(rs, "LIKE_FROM_USER"))
                 .build();
     }
 

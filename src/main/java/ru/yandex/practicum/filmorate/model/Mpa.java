@@ -24,11 +24,6 @@ public enum Mpa {
         return id;
     }
 
-//    @JsonValue
-//    public JsonObject getJsonId() {
-//        return new JsonObject(id);
-//    }
-
     public String getName() {
         return name;
     }

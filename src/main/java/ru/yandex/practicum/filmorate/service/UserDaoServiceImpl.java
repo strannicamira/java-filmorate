@@ -37,7 +37,7 @@ public class UserDaoServiceImpl implements UserDaoService {
 
     @Override
     public void addFriend(Integer userId, Integer friendId) {
-        userDao.addFriend(userId,friendId);
+        userDao.addFriend(userId, friendId);
     }
 
     @Override
@@ -47,11 +47,11 @@ public class UserDaoServiceImpl implements UserDaoService {
 
     @Override
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        return userDao.getCommonFriends(id,otherId);
+        return userDao.getCommonFriends(id, otherId);
     }
 
     @Override
     public boolean deleteFriend(Integer userId, Integer friendId) {
-        return userDao.deleteFriend(userId,friendId);
+        return userDao.deleteFriend(userId, friendId);
     }
 }

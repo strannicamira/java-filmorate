@@ -56,7 +56,7 @@ public class InMemoryUserService implements UserService {
 
     @Override
     public List<User> getCommonFriends(Integer userId, Integer otherId) {
-        return userStorage.getCommonFriends(userId,otherId);
+        return userStorage.getCommonFriends(userId, otherId);
     }
 
     @Override
