@@ -37,10 +37,6 @@ public class FilmDaoServiceImpl implements FilmDaoService {
         return filmDao.findFilmById(id);
     }
 
-    @Override
-    public Mpa findMpaById(Integer id) {
-        return filmDao.findMpaById(id);
-    }
 
     @Override
     public Optional<Mpa> findMpaByIdOptionally(Integer id) {
@@ -50,11 +46,6 @@ public class FilmDaoServiceImpl implements FilmDaoService {
     @Override
     public List<Mpa> findAllMpa() {
         return filmDao.findAllMpa();
-    }
-
-    @Override
-    public Genres findGenreById(Integer id) {
-        return filmDao.findGenreById(id);
     }
 
     @Override

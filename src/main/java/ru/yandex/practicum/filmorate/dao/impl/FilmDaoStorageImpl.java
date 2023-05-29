@@ -142,29 +142,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         insertMpa(film);
     }
 
-    private int rowInsertMpa(Film film) {
-        String sqlQueryInsert = "INSERT INTO FILM_GENRE(FILM_ID, MPA_ID) VALUES (?, ?)";
-        Integer filmId = film.getId();
-        Integer mpaId = film.getMpa().getId();
-        int count = jdbcTemplate.update(sqlQueryInsert, filmId, mpaId);
-        if (count == 0) {
-            throw new NotFoundException("mpa не удалось обновить: film_id/mpa_id" + filmId.toString() + "/" + mpaId);
-        }
-        return count;
-    }
-
-/*
-    private int rowUpdateMpa(Film film) {
-        int count;
-        String sqlQuery = "update film_mpa set film_id = ?, mpa_id = ? where film_id = ? and mpa_id = ?";
-        Integer filmId = film.getId();
-        Integer mpaId = film.getMpa().getId();
-        count = jdbcTemplate.update(sqlQuery, filmId, mpaId, filmId, mpaId);
-        return count;
-    }
-*/
-
-
     private int rowDeleteMpa(Film film) {
         String sqlQueryDelete = "DELETE FROM FILM_MPA WHERE FILM_ID = ?";
         int count = jdbcTemplate.update(sqlQueryDelete, film.getId());
@@ -174,7 +151,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         return count;
     }
 
-
     private void updateGenres(Film film) {
         deleteGenres(film);
         insertGenres(film);
@@ -183,68 +159,9 @@ public class FilmDaoStorageImpl implements FilmDao {
     private int deleteGenres(Film film) {
         int countDelete = 0;
         Set<Genres> genres = film.getGenres();
-//        if (genres != null && genres.size() != 0) {
         String sqlQueryDelete = "DELETE FROM FILM_GENRE WHERE FILM_ID = ?";
         countDelete = jdbcTemplate.update(sqlQueryDelete, film.getId());
-//            if (countDelete == 0) {
-//                throw new NotFoundException("genre не удалось обновить: film_id " + film.getId());
-//            }
-//        }
         return countDelete;
-    }
-
-    private void rowUpdateGenres(Film film) {
-        String sqlQueryUpdate = "UPDATE FILM_GENRE SET FILM_ID = ?, GENRE_ID = ? WHERE FILM_ID = ? AND GENRE_ID = ?";
-        for (Genres genre : film.getGenres()) {
-            Integer filmId = film.getId();
-            Integer genreId = genre.getId();
-            int countUpdate = jdbcTemplate.update(sqlQueryUpdate,
-                    filmId,
-                    genreId,
-                    filmId,
-                    genreId);
-            if (countUpdate == 0) {
-                String sqlQueryInsert = "INSERT INTO FILM_GENRE(FILM_ID, GENRE_ID) VALUES (?, ?)";
-                int countInsert = jdbcTemplate.update(sqlQueryInsert, filmId, genreId);
-                if (countInsert == 0) {
-                    throw new NotFoundException("genre не удалось обновить: film_id/genre_id " + film.getName() + "/" + genreId);
-
-                }
-            }
-        }
-    }
-
-
-    //    @Override
-    public Optional<Film> findFilmByIdOld(Integer id) {
-        String sql = "SELECT FILMS.ID, FILMS.NAME, FILMS.DESCRIPTION, FILMS.RELEASE_DATE, FILMS.DURATION,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA\n" +
-                "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
-                "         LEFT JOIN FILM_GENRE FC ON FILMS.ID = FC.FILM_ID\n" +
-                "         LEFT JOIN FILM_MPA FR ON FILMS.ID = FR.FILM_ID\n" +
-                "WHERE FILMS.ID = ? ";
-        SqlRowSet filmRows = jdbcTemplate.queryForRowSet(sql, id);
-
-        if (filmRows.next()) {
-            filmRows.first();
-            Film film = Film.builder()
-                    .id(filmRows.getInt("ID"))
-                    .name(filmRows.getString("NAME"))
-                    .description(filmRows.getString("DESCRIPTION"))
-                    .releaseDate(filmRows.getDate("RELEASE_DATE").toLocalDate())
-                    .duration(filmRows.getInt("DURATION"))
-                    .mpa(Mpa.forValues(filmRows.getInt("MPA")))
-                    .genres(UsefulDao.getIntSet(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
-                    .likes(UsefulDao.getIntSet(filmRows, "LIKE_FROM_USER"))
-                    .build();
-
-            log.info("Найден фильм: {} {}", film.getId(), film.getName());
-
-            return Optional.of(film);
-        } else {
-            log.info("Фильм с идентификатором {} не найден.", id);
-            throw new NotFoundException("Фильм не обновлен. Не может быть найден.");
-//            return Optional.empty();
-        }
     }
 
     @Override
@@ -253,14 +170,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         SqlRowSet rows = jdbcTemplate.queryForRowSet(sql);
         List<Film> films = UsefulDao.getIntSet(rows, "id").stream().map(id -> findFilmById(id).get()).collect(Collectors.toList());
         return films;
-    }
-
-
-    @Override
-    public Mpa findMpaById(Integer id) {
-        String sql = "SELECT * FROM MPA WHERE ID = ?";
-        List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs), id);
-        return mpa.get(0);
     }
 
     @Override
@@ -277,7 +186,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         } else {
             log.info("mpa с идентификатором {} не найден.", id);
             throw new NotFoundException("mpa не найден.");
-//            return Optional.empty();
         }
     }
 
@@ -286,14 +194,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         String sql = "SELECT DISTINCT * FROM MPA";
         List<Mpa> mpa = jdbcTemplate.query(sql, (rs, rowNum) -> makeMpa(rs));
         return mpa;
-    }
-
-
-    @Override
-    public Genres findGenreById(Integer id) {
-        String sql = "SELECT * FROM GENRES WHERE ID = ?";
-        List<Genres> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeGenre(rs), id);
-        return list.get(0);
     }
 
     @Override
@@ -309,7 +209,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         } else {
             log.info("Genre с идентификатором {} не найден.", id);
             throw new NotFoundException("Genre не найден.");
-//            return Optional.empty();
         }
     }
 
@@ -411,7 +310,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         } else {
             log.info("Фильм с идентификатором {} не найден.", id);
             throw new NotFoundException("Фильм не обновлен. Не может быть найден.");
-//            return Optional.empty();
         }
     }
 

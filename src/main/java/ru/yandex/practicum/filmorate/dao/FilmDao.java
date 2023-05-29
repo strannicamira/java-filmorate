@@ -16,13 +16,10 @@ public interface FilmDao {
 
     Optional<Film> findFilmById(Integer id);
 
-    Mpa findMpaById(Integer id);
 
     Optional<Mpa> findMpaByIdOptionally(Integer id);
 
     List<Mpa> findAllMpa();
-
-    Genres findGenreById(Integer id);
 
     Optional<Genres> findGenreByIdOptionally(Integer id);
 
