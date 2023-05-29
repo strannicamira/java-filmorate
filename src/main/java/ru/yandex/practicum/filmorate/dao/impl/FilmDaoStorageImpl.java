@@ -380,23 +380,20 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     @Override
     public List<Film> findTopLiked(Integer count) {
-        String sql = "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA, FL.USER_ID AS LIKE_FROM_USER\n" +
+        SqlRowSet rows = jdbcTemplate.queryForRowSet("SELECT FILMS.ID AS ID\n" +
                 "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
-                "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
-                "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
                 "         LEFT JOIN FILM_LIKE FL on FILMS.ID = FL.FILM_ID\n" +
-                "GROUP BY FILMS.ID, GENRE\n" +
-                "ORDER BY SUM(FL.USER_ID) DESC" +
-                "LIMIT ?";
-        List<Film> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), count);
-        return list;
+                "GROUP BY FILMS.ID\n" +
+                "ORDER BY COUNT(FL.USER_ID) DESC\n" +
+                "LIMIT ?", count);
+        return Useful.getInt(rows, "ID").stream().map(id->findFilmById(id).get()).collect(Collectors.toList());
 
 
 //        return filter(count, sort);
     }
 
     private Film makeFilm(ResultSet rs) throws SQLException {
-        return   Film.builder()
+        return Film.builder()
                 .id(rs.getInt("id"))
                 .name(rs.getString("name"))
                 .description(rs.getString("description"))
@@ -404,6 +401,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                 .duration(rs.getInt("duration"))
                 .mpa(Mpa.forValues(rs.getInt("MPA")))
                 .genres(Useful.getInt(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                .likes(Useful.getInt(rs, "LIKE_FROM_USER"))
                 .build();
     }
 
