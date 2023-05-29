@@ -27,8 +27,9 @@ public class UserDaoStorageImpl implements UserDao {
 
     @Override
     public List<User> findAll() {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select id from users ");
-        List<User> users = UsefulDao.getIntSet(userRows, "id").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
+        String sqlQuery = "SELECT ID FROM USERS";
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery);
+        List<User> users = UsefulDao.getIntSet(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
@@ -54,8 +55,7 @@ public class UserDaoStorageImpl implements UserDao {
     }
 
     private void save(User user) {
-        String sqlQuery = "insert into users(login, name, email, birthday ) " +
-                "values (?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO USERS(LOGIN, NAME, EMAIL, BIRTHDAY) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery,
                 user.getLogin(),
                 user.getName(),
@@ -66,31 +66,29 @@ public class UserDaoStorageImpl implements UserDao {
     private int insert(User user) {
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
-                        .withTableName("users")
-                        .usingGeneratedKeyColumns("id");
+                        .withTableName("USERS")
+                        .usingGeneratedKeyColumns("ID");
 
-        Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put("login", user.getLogin());
-        parameters.put("name", user.getName());
-        parameters.put("email", user.getEmail());
-        parameters.put("birthday", user.getBirthday());
-        log.info("Будет сохранен пользователь: '{}'", parameters);
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("LOGIN", user.getLogin());
+        parameters.put("NAME", user.getName());
+        parameters.put("EMAIL", user.getEmail());
+        parameters.put("BIRTHDAY", user.getBirthday());
+
+        log.info("Сохранение пользователя: '{}'", parameters);
 
         return simpleJdbcInsert.executeAndReturnKey(parameters).intValue();
     }
 
     @Override
     public User update(User user) {
-        if (user == null) {
-            throw new NotFoundException("Пользователь не будет обновлен. Никто.");
-        }
         updateUser(user);
         log.info("Пользователь обновлен: '{}'", user);
         return user;
     }
 
     private int updateUser(User user) {
-        String sqlQuery = "update users set login = ?, name = ?, email = ?, birthday = ? where id = ?";
+        String sqlQuery = "UPDATE USERS SET LOGIN = ?, NAME = ?, EMAIL = ?, BIRTHDAY = ? WHERE ID = ?";
         int count = jdbcTemplate.update(sqlQuery,
                 user.getLogin(),
                 user.getName(),
@@ -98,25 +96,26 @@ public class UserDaoStorageImpl implements UserDao {
                 user.getBirthday(),
                 user.getId());
         if (count == 0) {
-            throw new NotFoundException("Пользователь не сохранен: " + user.getLogin());
+            throw new NotFoundException("Пользователь не сохранен: id/login" + +user.getId() + "/" + user.getLogin());
         }
         return count;
     }
 
     @Override
     public Optional<User> findUserById(Integer id) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("SELECT ID, LOGIN,NAME,EMAIL,BIRTHDAY, FR.REQUESTER_ID AS FRIENDS\n" +
+        String sqlQuery = "SELECT ID, LOGIN, NAME, EMAIL, BIRTHDAY, FR.REQUESTER_ID AS FRIENDS\n" +
                 "FROM FILMORATE.PUBLIC.USERS AS U\n" +
-                "          LEFT JOIN FILMORATE.PUBLIC.FRIENDS AS FR ON U.ID = FR.RESPONDER_ID \n" +
-                "WHERE U.ID = ?", id);
+                "LEFT JOIN FILMORATE.PUBLIC.FRIENDS AS FR ON U.ID = FR.RESPONDER_ID \n" +
+                "WHERE U.ID = ?";
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, id);
 
         if (userRows.next()) {
             User user = User.builder()
-                    .id(userRows.getInt("id"))
-                    .login(userRows.getString("login"))
-                    .name(userRows.getString("name"))
-                    .email(userRows.getString("email"))
-                    .birthday(userRows.getDate("birthday").toLocalDate())
+                    .id(userRows.getInt("ID"))
+                    .login(userRows.getString("LOGIN"))
+                    .name(userRows.getString("NAME"))
+                    .email(userRows.getString("EMAIL"))
+                    .birthday(userRows.getDate("BIRTHDAY").toLocalDate())
 //                    .friends((Set<Integer>) collect(userRows).stream().map(arg -> arg.getInt("FRIENDS")).collect(Collectors.toCollection(HashSet::new)))
                     .friends(UsefulDao.getIntSet(userRows, "FRIENDS"))
                     .build();
@@ -136,10 +135,10 @@ public class UserDaoStorageImpl implements UserDao {
         if (userId < 1 || friendId < 1) {
             throw new InvalidIdException("Пользователь не обновлен. Не может быть найден.");
         }
-        String sqlQueryUpdate = "update friends set is_friends = ? where responder_id = ? and requester_id = ? ";
+        String sqlQueryUpdate = "UPDATE FRIENDS SET IS_FRIENDS = ? WHERE RESPONDER_ID = ? AND REQUESTER_ID = ?";
         int count = jdbcTemplate.update(sqlQueryUpdate, true, friendId, userId);
 
-        String sqlQueryInsert = "insert into friends(responder_id, requester_id, is_friends) values (?, ?, ?)";
+        String sqlQueryInsert = "INSERT INTO FRIENDS(RESPONDER_ID, REQUESTER_ID, IS_FRIENDS) VALUES (?, ?, ?)";
         if (count == 0) {
             jdbcTemplate.update(sqlQueryInsert, userId, friendId, false);
         } else {
@@ -149,15 +148,16 @@ public class UserDaoStorageImpl implements UserDao {
 
     @Override
     public List<User> getFriends(Integer userId) {
-        SqlRowSet userRows = jdbcTemplate.queryForRowSet("select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? ", userId);
+        String sqlQuery = "SELECT FRIENDS.REQUESTER_ID AS ID FROM FILMORATE.PUBLIC.FRIENDS AS FRIENDS WHERE FRIENDS.RESPONDER_ID = ?";
+        SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, userId);
         List<User> users = UsefulDao.getIntSet(userRows, "ID").stream().map(id -> findUserById(id).get()).collect(Collectors.toList());
         return users;
     }
 
     @Override
     public List<User> getCommonFriends(Integer id, Integer otherId) {
-        String sqlQuery = "select FRIENDS.REQUESTER_ID AS ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ? AND\n" +
-                "    FRIENDS.REQUESTER_ID IN (select FRIENDS.REQUESTER_ID from FILMORATE.PUBLIC.FRIENDS AS FRIENDS where FRIENDS.RESPONDER_ID = ?)";
+        String sqlQuery = "SELECT FRIENDS.REQUESTER_ID AS ID FROM FILMORATE.PUBLIC.FRIENDS AS FRIENDS WHERE FRIENDS.RESPONDER_ID = ? AND\n" +
+                "FRIENDS.REQUESTER_ID IN (SELECT FRIENDS.REQUESTER_ID FROM FILMORATE.PUBLIC.FRIENDS AS FRIENDS WHERE FRIENDS.RESPONDER_ID = ?)";
         SqlRowSet userRows = jdbcTemplate.queryForRowSet(sqlQuery, id, otherId);
         List<User> users = UsefulDao.getIntSet(userRows, "ID").stream().map(i -> findUserById(i).get()).collect(Collectors.toList());
         return users;
@@ -165,21 +165,20 @@ public class UserDaoStorageImpl implements UserDao {
 
     @Override
     public boolean deleteFriend(Integer userId, Integer friendId) { //4 [1]
-        String sqlQueryUpdate = "update friends set is_friends = ? " +
-                "where requester_id = ? and responder_id = ?";
+        String sqlQueryUpdate = "UPDATE FRIENDS SET IS_FRIENDS = ? WHERE REQUESTER_ID = ? AND RESPONDER_ID = ?";
         int count = jdbcTemplate.update(sqlQueryUpdate, false, userId, friendId);
 
-        String sqlQuery = "delete from friends where REQUESTER_ID = ? and  RESPONDER_ID = ?";
-        return jdbcTemplate.update(sqlQuery, friendId, userId) > 0;
+        String sqlQueryDelete = "DELETE FROM FRIENDS WHERE REQUESTER_ID = ? AND  RESPONDER_ID = ?";
+        return jdbcTemplate.update(sqlQueryDelete, friendId, userId) > 0;
     }
 
     private User mapRowToUsers(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
-                .id(resultSet.getInt("id"))
-                .login(resultSet.getString("login"))
-                .name(resultSet.getString("name"))
-                .email(resultSet.getString("email"))
-                .birthday(resultSet.getDate("birthday").toLocalDate())
+                .id(resultSet.getInt("ID"))
+                .login(resultSet.getString("LOGIN"))
+                .name(resultSet.getString("NAME"))
+                .email(resultSet.getString("EMAIL"))
+                .birthday(resultSet.getDate("BIRTHDAY").toLocalDate())
                 .friends(UsefulDao.getIntSet(resultSet, "FRIEND"))
                 .build();
     }
