@@ -71,4 +71,21 @@ public class FilmDaoController {
         return filmDaoService.findAllGenres();
     }
 
+
+    @PutMapping(value = "/films/{id}/like/{userId}")
+    public Film addLike(@PathVariable("id") Integer filmId,
+                        @PathVariable("userId") Integer userId) {
+        return filmDaoService.addLike(filmId, userId);
+    }
+
+    @DeleteMapping(value = "/films/{id}/like/{userId}")
+    public Film deleteLike(@PathVariable("id") Integer filmId,
+                           @PathVariable("userId") Integer userId) {
+        return filmDaoService.deleteLike(filmId, userId);
+    }
+
+    @GetMapping(value = "/films/popular")
+    public List<Film> findTop(@RequestParam(defaultValue = "10") Integer count) {
+        return filmDaoService.findTopLiked(count);
+    }
 }

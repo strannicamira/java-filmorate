@@ -67,5 +67,20 @@ public class FilmDaoServiceImpl implements FilmDaoService {
         return filmDao.findAllGenres();
     }
 
+    @Override
+    public Film addLike(Integer filmId, Integer userId) {
+        return filmDao.addLike(filmId, userId);
+    }
+
+    @Override
+    public Film deleteLike(Integer filmId, Integer userId) {
+        return filmDao.deleteLike(filmId, userId);
+    }
+
+    @Override
+    public List<Film> findTopLiked(Integer count) {
+        return filmDao.findTopLiked(count);
+    }
+
 
 }

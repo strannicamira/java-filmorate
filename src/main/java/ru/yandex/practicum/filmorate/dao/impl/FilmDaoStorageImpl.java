@@ -18,6 +18,9 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.Constants.ASCENDING_ORDER;
+import static ru.yandex.practicum.filmorate.Constants.DESCENDING_ORDER;
+
 @Component
 @Slf4j
 public class FilmDaoStorageImpl implements FilmDao {
@@ -89,7 +92,7 @@ public class FilmDaoStorageImpl implements FilmDao {
 
     private void insertGenres(Film film) {
         if (film.getGenres() == null) {
-            film.setGenres(new HashSet<>());
+            film.setGenres(new TreeSet<>());
         }
         SimpleJdbcInsert simpleJdbcInsert =
                 new SimpleJdbcInsert(jdbcTemplate)
@@ -221,7 +224,9 @@ public class FilmDaoStorageImpl implements FilmDao {
                         "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
                         "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
                         "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
-                        "WHERE FILMS.ID = ?", id);
+                        "WHERE FILMS.ID = ? " +
+                        "ORDER BY GENRE", id);
+
 
         if (filmRows.next()) {
             filmRows.first();
@@ -232,7 +237,7 @@ public class FilmDaoStorageImpl implements FilmDao {
                     .releaseDate(filmRows.getDate("release_date").toLocalDate())
                     .duration(filmRows.getInt("duration"))
                     .mpa(Mpa.forValues(filmRows.getInt("MPA")))
-                    .genres(Useful.getInt(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).collect(Collectors.toCollection(HashSet::new)))
+                    .genres(Useful.getInt(filmRows, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
                     .build();
 
             log.info("Найден фильм: {} {}", film.getId(), film.getName());
@@ -312,7 +317,6 @@ public class FilmDaoStorageImpl implements FilmDao {
         return list;
     }
 
-
     private Mpa makeMpa(ResultSet rs) throws SQLException {
         return Mpa.forValues(rs.getInt("id"));
     }
@@ -320,4 +324,109 @@ public class FilmDaoStorageImpl implements FilmDao {
     private Genres makeGenre(ResultSet rs) throws SQLException {
         return Genres.forValues(rs.getInt("id"));
     }
+
+    private static final String sort = ASCENDING_ORDER;
+
+    private int compareGenres(Genres f0, Genres f1, String sort) {
+        int result = f0.getId() - (f1.getId());
+        switch (sort) {
+            case ASCENDING_ORDER:
+                result = 1 * result;
+                break;
+            case DESCENDING_ORDER:
+                result = -1 * result; //обратный порядок сортировки
+                break;
+        }
+        return result;
+    }
+
+
+    /////////////////////////////////////////
+    @Override
+    public Film addLike(Integer filmId, Integer userId) {
+        insertLike(filmId, userId);
+        return findFilmById(filmId).get();
+    }
+
+    private void insertLike(Integer filmId, Integer userId) {
+
+        SimpleJdbcInsert simpleJdbcInsert =
+                new SimpleJdbcInsert(jdbcTemplate)
+                        .withTableName("film_like");
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("film_id", filmId);
+        parameters.put("user_id", userId);
+
+        log.info("Будет сохранен mpa: '{}'", parameters);
+        simpleJdbcInsert.execute(parameters);
+    }
+
+    @Override
+    public Film deleteLike(Integer filmId, Integer userId) {
+        rowDeleteLike(filmId, userId);
+        return findFilmById(filmId).get();
+    }
+
+    private int rowDeleteLike(Integer filmId, Integer userId) {
+        String sqlQueryDelete = "delete from film_like where film_id = ? and user_id =?";
+        int count = jdbcTemplate.update(sqlQueryDelete, filmId, userId);
+        if (count == 0) {
+            throw new NotFoundException("Не удалось лайкнуть: film_id/user_id " + filmId + "/" + userId);
+        }
+        return count;
+    }
+
+
+    @Override
+    public List<Film> findTopLiked(Integer count) {
+        String sql = "SELECT FILMS.id, FILMS.name, FILMS.description, FILMS.release_date, FILMS.duration,  FC.GENRE_ID AS GENRE, FR.MPA_ID AS MPA, FL.USER_ID AS LIKE_FROM_USER\n" +
+                "FROM FILMORATE.PUBLIC.FILMS AS FILMS\n" +
+                "         LEFT JOIN FILM_GENRE FC on FILMS.ID = FC.FILM_ID\n" +
+                "         LEFT JOIN FILM_MPA FR on FILMS.ID = FR.FILM_ID\n" +
+                "         LEFT JOIN FILM_LIKE FL on FILMS.ID = FL.FILM_ID\n" +
+                "GROUP BY FILMS.ID, GENRE\n" +
+                "ORDER BY SUM(FL.USER_ID) DESC" +
+                "LIMIT ?";
+        List<Film> list = jdbcTemplate.query(sql, (rs, rowNum) -> makeFilm(rs), count);
+        return list;
+
+
+//        return filter(count, sort);
+    }
+
+    private Film makeFilm(ResultSet rs) throws SQLException {
+        return   Film.builder()
+                .id(rs.getInt("id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .mpa(Mpa.forValues(rs.getInt("MPA")))
+                .genres(Useful.getInt(rs, "GENRE").stream().map(genreId -> Genres.forValues(genreId)).sorted((p0, p1) -> compareGenres(p0, p1, sort)).collect(Collectors.toCollection(TreeSet::new)))
+                .build();
+    }
+
+/*    public List<Film> filter(Integer count, String sort) {
+        return films
+                .values()
+                .stream()
+                .sorted((p0, p1) -> compare(p0, p1, sort))
+                .limit(count)
+                .collect(Collectors.toList());
+    }*/
+
+    private int compareFilms(Film f0, Film f1, String sort) {
+        int result = f0.getLikes().size() - (f1.getLikes().size());
+        switch (sort) {
+            case ASCENDING_ORDER:
+                result = 1 * result;
+                break;
+            case DESCENDING_ORDER:
+                result = -1 * result; //обратный порядок сортировки
+                break;
+        }
+        return result;
+    }
+////////////////////////////////////////////////////////////////
 }

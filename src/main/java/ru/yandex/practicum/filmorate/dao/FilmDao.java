@@ -27,4 +27,10 @@ public interface FilmDao {
     Optional<Genres> findGenreByIdOptionally(Integer id);
 
     List<Genres> findAllGenres();
+
+    Film addLike(Integer filmId, Integer userId);
+
+    Film deleteLike(Integer filmId, Integer userId);
+
+    List<Film> findTopLiked(Integer count);
 }
