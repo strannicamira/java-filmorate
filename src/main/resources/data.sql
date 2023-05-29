@@ -1,6 +1,6 @@
 --DROP ALL OBJECTS DELETE FILES;
 
-/*INSERT INTO PUBLIC.GENRES
+INSERT INTO PUBLIC.GENRES
 (NAME)
 VALUES ('Комедия'),
        ('Драма'),
@@ -15,4 +15,4 @@ VALUES ('G'),
        ('PG'),
        ('PG-13'),
        ('R'),
-       ('NC-17');*/
+       ('NC-17');
