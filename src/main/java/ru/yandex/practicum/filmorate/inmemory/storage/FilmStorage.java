@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage;
+package ru.yandex.practicum.filmorate.inmemory.storage;
 
 import ru.yandex.practicum.filmorate.model.Film;
 
@@ -17,5 +17,5 @@ public interface FilmStorage {
 
     Film findFilmById(Integer id);
 
-     List<Film> findTopLiked(Integer count);
+    List<Film> findTopLiked(Integer count);
 }

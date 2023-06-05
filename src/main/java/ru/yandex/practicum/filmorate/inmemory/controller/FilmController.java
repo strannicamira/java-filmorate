@@ -1,20 +1,25 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.inmemory.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.inmemory.service.InMemoryFilmService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
 
-@RestController
+//@RestController
 @Slf4j
 @RequiredArgsConstructor
 public class FilmController {
-    private final FilmService filmService;
+
+    private final InMemoryFilmService filmService;
+
+    @GetMapping("/films")
+    public List<Film> findAll() {
+        return filmService.findAll();
+    }
 
     @PostMapping(value = "/films")
     public Film create(@Valid @RequestBody Film film) {
@@ -27,16 +32,9 @@ public class FilmController {
     }
 
     @GetMapping("/films/{id}")
-    public Optional<Film> getFilm(@PathVariable("id") Integer id) {
+    public Film getFilm(@PathVariable("id") Integer id) {
         return filmService.findFilmById(id);
     }
-
-
-    @GetMapping("/films")
-    public List<Film> findAll() {
-        return filmService.findAll();
-    }
-
 
     @PutMapping(value = "/films/{id}/like/{userId}")
     public Film addLike(@PathVariable("id") Integer filmId,
@@ -54,4 +52,5 @@ public class FilmController {
     public List<Film> findTop(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.findTopLiked(count);
     }
+
 }

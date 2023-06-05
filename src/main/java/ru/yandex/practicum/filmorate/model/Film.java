@@ -20,6 +20,8 @@ public class Film {
     @Positive
     private Integer duration;
     private Set<Integer> likes;
+    private Set<Genres> genres;
+    private Mpa mpa;
 
     public Set<Integer> getLikes() {
         if (likes == null) {

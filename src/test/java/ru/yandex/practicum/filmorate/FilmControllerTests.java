@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.service.InMemoryFilmService;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.inmemory.controller.FilmController;
+import ru.yandex.practicum.filmorate.inmemory.service.InMemoryFilmService;
+import ru.yandex.practicum.filmorate.inmemory.storage.FilmStorage;
+import ru.yandex.practicum.filmorate.inmemory.storage.InMemoryFilmStorage;
 
 import javax.validation.ValidationException;
 import java.time.LocalDate;

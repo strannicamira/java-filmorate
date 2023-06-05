@@ -1,11 +1,19 @@
-package ru.yandex.practicum.filmorate.service;
+package ru.yandex.practicum.filmorate.dao;
 
-import ru.yandex.practicum.filmorate.dao.UserDao;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
+import java.util.Optional;
 
-public interface UserService extends UserDao {
+public interface UserDao {
+    List<User> findAll();
+
+    User create(User user);
+
+    User update(User user);
+
+    Optional<User> findUserById(Integer id);
+
     void addFriend(Integer userId, Integer friendId);
 
     List<User> getFriends(Integer userId);
